@@ -11,30 +11,51 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #include "entity.h"
 
 void drawMenu();					//disegna il menu principale
+void pushElement(struct Player*);			//aggiunge un valore alla lista dei giocatori
 
 int main() {
 	struct Player* head = NULL;
 
-	head = (struct Player*)malloc(sizeof(struct Player));
+	//head = (struct Player*)malloc(sizeof(struct Player));
+
 	while (true) {
-		//drawMenu();
+		int id;
+		printf("Add value: ");
+		scanf(" %d", &id);
 
-		head->id = 2;
-		head->next = (struct Player*)malloc(sizeof(struct Player));
-		head->next->id = 3;
-		head->next->next = (struct Player*)malloc(sizeof(struct Player));
-		head->next->next->id = 4;
-		head->next->next->next = NULL;
+		if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
+			head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
+			head->id = id;
+			head->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
+		}
+		else {		//se invece il primo elemento già esiste allora esegue un push
+			pushElement(head, id);
+		}
 
-		struct Player* current = head;
+		/*struct Player* current = head;		//just output
 
 		while (current != NULL) {
 			printf("%d\n", current->id);
 			current = current->next;
-		}
+		}*/
 
 		system("pause");
 	}
 
 	return 0;
+}
+
+void drawMenu() {
+
+}
+
+void pushElement(struct Player* head, int id) {
+
+	while (head->next != NULL) {
+		head = head->next;
+	}
+
+	head->next = (struct Player*)malloc(sizeof(struct Player));
+	head->next->id = id;
+	head->next->next = NULL;
 }
