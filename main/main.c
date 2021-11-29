@@ -4,9 +4,41 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 ---MORE INFO ONLINE---
 */
 
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "entity.h"
 
+void drawMenu();					//disegna il menu principale
+
 int main() {
+	struct Player* head = NULL;
+
+	head = (struct Player*)malloc(sizeof(struct Player));
+	while (true) {
+		//drawMenu();
+
+		head->id = 2;
+		head->next = (struct Player*)malloc(sizeof(struct Player));
+		head->next->id = 3;
+		head->next->next = (struct Player*)malloc(sizeof(struct Player));
+		head->next->next->id = 4;
+		head->next->next->next = NULL;
+
+		struct Player* current = head;
+
+		while (current != NULL) {
+			printf("%d\n", current->id);
+			current = current->next;
+		}
+
+		system("pause");
+	}
+
 	return 0;
+}
+
+void drawMenu() {
+
 }
