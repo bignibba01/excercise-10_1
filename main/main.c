@@ -12,15 +12,11 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #include "entity.h"
 
 void drawMenu();							//disegna il menu principale
-void popFirstElement(struct Player**);		//toglie un valore dalla testa della coda (FIFO)
-void printAllElement(struct Player*);		//visualizza tutta la coda
-void pushElement(struct Player*, char*);			//aggiunge un valore alla coda dei giocatori
 void registerPlayer(struct Player*);		//aggiungi i giocatori al gioco
 
 int main() {
 	struct Player* head = NULL;
 
-	//head = (struct Player*)malloc(sizeof(struct Player));
 
 	while (true) {
 
@@ -28,7 +24,6 @@ int main() {
 		printf("Add value: ");
 		scanf(" %[^\n]s", id);
 		fflush(stdin);
-
 
 		if(strcmp(id, "-1") != 0){
 
@@ -53,36 +48,4 @@ int main() {
 
 void drawMenu() {
 
-}
-
-void popFirstElement(struct Player** head) {
-	//int retval = -1;
-	struct Player* next_node = NULL;
-
-	if (*head == NULL) {
-		return -1;
-	}
-
-	next_node = (*head)->next;
-	//retval = (*head)->id;
-	free(*head);
-	*head = next_node;
-}
-
-void printAllElement(struct Player* head) {
-	while (head != NULL) {
-		printf("%s\n", head->color);
-		head = head->next;
-	}
-}
-
-void pushElement(struct Player* head, char id[20]) {
-
-	while (head->next != NULL) {
-		head = head->next;
-	}
-
-	head->next = (struct Player*)malloc(sizeof(struct Player));
-	strcpy(head->next->color, id);
-	head->next->next = NULL;
 }
