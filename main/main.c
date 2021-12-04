@@ -13,7 +13,7 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #include "entity.h"
 
 void drawMenu();							//disegna il menu principale
-int getNumberPlayer();	//probabile problema					//prende il numero dei giocatori
+int getNumberPlayer();						//prende il numero dei giocatori
 void registerPlayer();						//inserisce il giocatore nella coda
 int rollDice();								//tira il dado (1-6)
 
@@ -78,9 +78,11 @@ void drawMenu() {
 int getNumberPlayer() {
 	int tmpNumber = 0;
 
-	while (head != NULL) {
-		tmpNumber = head->id;
-		head = head->next;
+	struct Player* tmp = head;
+
+	while (tmp != NULL) {
+		tmpNumber = tmp->id;
+		tmp = tmp->next;
 	}
 
 	return tmpNumber;
