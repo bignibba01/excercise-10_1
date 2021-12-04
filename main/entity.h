@@ -1,13 +1,6 @@
 #ifndef ENTITY_H_INCLUDED
 #define ENTITY_H_INCLUDED
 
-#define RED "\33[31m"		//1
-#define GRN "\33[32m"		//2
-#define YEL "\33[33m"		//3
-#define BLU "\33[34m"		//4
-#define PRP "\33[35m"		//5
-#define CYN "\33[36m"		//6
-#define WHT "\33[37m"		//7
 #define reset "\33[0m"
 
 struct Player {		//player entity
