@@ -12,14 +12,44 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #include <time.h>
 #include "entity.h"
 
+#ifdef __MINGW32__
+	#define NEED_COLOR_FIX
+#endif
+#ifdef NEED_COLOR_FIX
+	#include <windows.h>
+	#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
+#define BLK "\33[30m"
+#define RED "\33[31m"
+#define GRN "\33[32m"
+#define YEL "\33[33m"
+#define BLU "\33[34m"
+#define MAG "\33[35m"
+#define CYN "\33[36m"
+#define WHT "\33[37m"
+#define reset "\33[0m"
+
 void drawMenu();							//disegna il menu principale
 int getNumberPlayer();						//prende il numero dei giocatori
+void printAvailableColor();					//stampa i colori disponibili
 void registerPlayer();						//inserisce il giocatore nella coda
 int rollDice();								//tira il dado (1-6)
 
 struct Player* head = NULL;
 
 int main() {
+
+	#ifdef NEED_COLOR_FIX				//procedimento per abilitare i colori su windows
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (handle != INVALID_HANDLE_VALUE) {
+		DWORD mode = 0;
+		if (GetConsoleMode(handle, &mode)) {
+			mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+			SetConsoleMode(handle, mode);
+		}
+	}
+	#endif
 
 	while (true) {
 		_Bool end = false;		//esce dal ciclo continuo
@@ -35,7 +65,7 @@ int main() {
 			if (oper >= 1 && oper <= 4)
 				flag = false;
 			else
-				printf("Errore -> Operazione non valida\n");
+				printf(RED "Errore -> Operazione non valida\n" reset);
 		} while (flag);
 
 		switch (oper) {
@@ -88,10 +118,16 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
+void printAvailableColor() {
+	 
+}
+
 void registerPlayer() {
 
 	int tmpId = 0;
 	char tmpColor[20] = { 0 };
+
+	printf("Scegli il colore del giocatore: ");
 
 	if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
 		head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
