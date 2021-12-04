@@ -20,17 +20,9 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 	#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-#define BLK "\33[30m"
-#define RED "\33[31m"
-#define GRN "\33[32m"
-#define YEL "\33[33m"
-#define BLU "\33[34m"
-#define MAG "\33[35m"
-#define CYN "\33[36m"
-#define WHT "\33[37m"
-#define reset "\33[0m"
-
 void drawMenu();							//disegna il menu principale
+char* getColor(int);
+char* getColorCode(int);
 int getNumberPlayer();						//prende il numero dei giocatori
 void printAvailableColor();					//stampa i colori disponibili
 void registerPlayer();						//inserisce il giocatore nella coda
@@ -65,7 +57,7 @@ int main() {
 			if (oper >= 1 && oper <= 4)
 				flag = false;
 			else
-				printf(RED "Errore -> Operazione non valida\n" reset);
+				printf("\33[31mErrore->Operazione non valida\n" reset);
 		} while (flag);
 
 		switch (oper) {
@@ -87,7 +79,7 @@ int main() {
 			break;
 		}
 		default: {
-			printf("Errore -> L'operazione non esiste\n");
+			printf(RED"Errore -> L'operazione non esiste\n"reset);
 		}
 		}
 
@@ -105,6 +97,58 @@ void drawMenu() {
 	printf("1)Inizia partita!\n2)Aggiungi giocatori (%d correnti)!\n3)Lista dei giocatori\n4)Esci\n", getNumberPlayer());
 }
 
+char* getColor(int value) {
+	switch (value) {
+	case 1: {
+		return "Red";
+	}
+	case 2: {
+		return "Green";
+	}
+	case 3: {
+		return "Yellow";
+	}
+	case 4: {
+		return "Blue";
+	}
+	case 5: {
+		return "Purple";
+	}
+	case 6: {
+		return "Cyan";
+	}
+	case 7: {
+		return "White";
+	}
+	}
+}
+
+char* getColorCode(int value) {
+	switch (value) {
+	case 1: {
+		return "\33[31m";
+	}
+	case 2: {
+		return "\33[32m";
+	}
+	case 3: {
+		return "\33[33m";
+	}
+	case 4: {
+		return "\33[34m";
+	}
+	case 5: {
+		return "\33[35m";
+	}
+	case 6: {
+		return "\33[36m";
+	}
+	case 7: {
+		return "\33[37m";
+	}
+	}
+}
+
 int getNumberPlayer() {
 	int tmpNumber = 0;
 
@@ -118,8 +162,28 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
-void printAvailableColor() {
-	 
+void printAvailableColor(struct Player* head) {
+	struct Player* tmp = head;
+	int colors[7] = { 0 };
+
+	for (int i = 0; i < sizeof(colors) / sizeof(int); i++)
+		colors[i] = i + 1;
+	
+	while (tmp != NULL) {
+
+		for (int i = 0; i < sizeof(colors) / sizeof(int); i++) {
+			if (colors[i] == tmp->color)
+				colors[i] = -1;
+		}
+
+		tmp = tmp->next;
+	}
+
+	for (int i = 0; i < sizeof(colors) / sizeof(int); i++) {
+		if (colors[i] != -1)
+			printf("%d = %s\n", i + 1, getColor(colors[i]));
+	}
+
 }
 
 void registerPlayer() {
@@ -127,7 +191,8 @@ void registerPlayer() {
 	int tmpId = 0;
 	char tmpColor[20] = { 0 };
 
-	printf("Scegli il colore del giocatore: ");
+	printf("Scegli il colore del giocatore!\n");
+	printAvailableColor(head);
 
 	if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
 		head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
