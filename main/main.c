@@ -20,9 +20,11 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 	#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
+_Bool checkFreeColor(short int);			//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
+void drawMapGame();							//disegna la mappa di gioco
 void drawMenu();							//disegna il menu principale
-char* getColor(int);
-char* getColorCode(int);
+char* getColor(int);						//prende il nome del colore assegnato ad un valore intero
+char* getColorCode(int);					//prende il codice del colore per disegnarlo nel terminale
 int getNumberPlayer();						//prende il numero dei giocatori
 void printAvailableColor();					//stampa i colori disponibili
 void registerPlayer();						//inserisce il giocatore nella coda
@@ -57,11 +59,18 @@ int main() {
 			if (oper >= 1 && oper <= 4)
 				flag = false;
 			else
-				printf("\33[31mErrore->Operazione non valida\n" reset);
+				printf("%sErrore->Operazione non valida\n" reset, getColorCode(1));
 		} while (flag);
 
 		switch (oper) {
 		case 1: {
+			if (getNumberPlayer() <= 1) {
+				printf("%sErrore -> Devi inserire almeno due giocatori per poter giocare.\n"reset, getColorCode(1));
+				system("pause");
+			}
+			else {
+
+			}
 			break;
 			}
 		case 2: {
@@ -79,7 +88,7 @@ int main() {
 			break;
 		}
 		default: {
-			printf(RED"Errore -> L'operazione non esiste\n"reset);
+			printf("%sErrore -> L'operazione non esiste\n"reset, getColorCode(1));
 		}
 		}
 
@@ -91,6 +100,19 @@ int main() {
 	}
 
 	return 0;
+}
+
+_Bool checkFreeColor(short int color) {
+	struct Player* tmp = head;
+
+	while (tmp != NULL) {
+		if (tmp->color == color) {
+			printf("%sErrore -> Colore gia' in uso da un altro giocatore.\n"reset, getColorCode(1));
+			return false;
+		}
+		tmp = tmp->next;
+	}
+	return true;
 }
 
 void drawMenu() {
@@ -126,33 +148,35 @@ char* getColor(int value) {
 char* getColorCode(int value) {
 	switch (value) {
 	case 1: {
-		return "\33[31m";
+		return "\33[31m";		//red
 	}
 	case 2: {
-		return "\33[32m";
+		return "\33[32m";		//green
 	}
 	case 3: {
-		return "\33[33m";
+		return "\33[33m";		//yellow
 	}
 	case 4: {
-		return "\33[34m";
+		return "\33[34m";		//blue
 	}
 	case 5: {
-		return "\33[35m";
+		return "\33[35m";		//purple
 	}
 	case 6: {
-		return "\33[36m";
+		return "\33[36m";		//cyan
 	}
 	case 7: {
-		return "\33[37m";
+		return "\33[37m";		//white
+	}
+	default: {
+		return "\33[0m";
 	}
 	}
 }
 
 int getNumberPlayer() {
 	int tmpNumber = 0;
-
-	struct Player* tmp = head;
+	struct Player* tmp = head;		//salvo una copia della testa della lista
 
 	while (tmp != NULL) {
 		tmpNumber = tmp->id;
@@ -188,28 +212,42 @@ void printAvailableColor(struct Player* head) {
 
 void registerPlayer() {
 
-	int tmpId = 0;
-	char tmpColor[20] = { 0 };
+	short int tmpId = 0;
+	short int tmpColor = 0;
 
-	printf("Scegli il colore del giocatore!\n");
-	printAvailableColor(head);
-
-	if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
-		head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
-
-		head->id = 1;
-		head->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
+	struct Player* tmp = head;
+	while (tmp != NULL) {
+		tmpId = tmp->id + 1;			//preleva l'id dall ultimo elemento della lista e lo incrementa
+		tmp = tmp->next;
 	}
-	else {		//se invece il primo elemento già esiste allora esegue un push
-		struct Player* tmp = head;
-		while (tmp != NULL) {
-			tmpId = tmp->id + 1;			//preleva l'id dall ultimo elemento della lista e lo incrementa
-			tmp = tmp->next;
+	if (tmpId == 6) {				//6 perche tmpId = tmp->id + 1 (5+1)
+		printf("Numero massimo di giocatori raggiunto!\n");
+	}
+	else {
+		_Bool flag = false;
+		printf("Scegli il colore del giocatore!\n");
+
+		do {
+			printAvailableColor(head);
+			scanf(" %hd", &tmpColor);
+			
+			if (tmpColor >= 7 || tmpColor <= 0) {
+				flag = false;
+				printf("%sErrore -> Il valore non e' valido.\n"reset, getColorCode(1));
+			}else
+				flag = checkFreeColor(tmpColor);
+		} while (!flag);
+
+		if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
+			head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
+
+			head->id = 1;
+			head->color = tmpColor;
+			head->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
 		}
-		if (tmpId == 6)				//6 perche tmpId = tmp->id + 1 (5+1)
-			printf("Numero massimo di giocatori raggiunto!\n");
-		else
-			pushElement(head, tmpId);
+		else {		//se invece il primo elemento già esiste allora esegue un push
+			pushElement(head, tmpId, tmpColor);
+		}
 	}
 }
 

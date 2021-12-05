@@ -11,7 +11,7 @@ struct Player {		//player entity
 
 void popFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printAllElement(struct Player*);				//visualizza tutta la coda
-void pushElement(struct Player*, int);			//aggiunge un valore alla coda dei giocatori
+void pushElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
 
 void popFirstElement(struct Player** head) {
 	struct Player* next_node = NULL;
@@ -32,7 +32,7 @@ void printAllElement(struct Player* head) {
 	}
 }
 
-void pushElement(struct Player* head, int id) {
+void pushElement(struct Player* head, short int id, short int color) {
 
 	while (head->next != NULL) {
 		head = head->next;
@@ -40,6 +40,7 @@ void pushElement(struct Player* head, int id) {
 
 	head->next = (struct Player*)malloc(sizeof(struct Player));
 	head->next->id = id;
+	head->next->color = color;
 	head->next->next = NULL;
 }
 
