@@ -4,12 +4,12 @@
 #define reset "\33[0m"
 
 struct Coord {
+	short int numberCell;			//per facilitare il salto salta direttamente nella casella numerata
 	short int x;		//indice x
 	short int y;		//indice y
 };
 
 struct Cell {
-	short int numberCell;			//per facilitare il salto salta direttamente nella casella numerata
 	short int jumptoBox;			//numero delle posizioni da saltare
 	struct Coord coords;			//coordinate (indici) della casella
 };

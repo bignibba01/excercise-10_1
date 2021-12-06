@@ -20,18 +20,21 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 	#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-_Bool checkFreeColor(short int);			//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
-void drawMapGame();							//disegna la mappa di gioco
-void drawMenu();							//disegna il menu principale
-char* getColor(int);						//prende il nome del colore assegnato ad un valore intero
-char* getColorCode(int);					//prende il codice del colore per disegnarlo nel terminale
-int getNumberPlayer();						//prende il numero dei giocatori
-void printAvailableColor();					//stampa i colori disponibili
-void registerPlayer();						//inserisce il giocatore nella coda
-int rollDice();								//tira il dado (1-6)
+_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
+void drawMapGame();								//disegna la mappa di gioco
+void drawMenu();								//disegna il menu principale
+char* getColor(int);							//prende il nome del colore assegnato ad un valore intero
+char* getColorCode(int);						//prende il codice del colore per disegnarlo nel terminale
+int getNumberPlayer();							//prende il numero dei giocatori
+void prepareNumberCells(struct Cell*);		//prepara la matrice con i numeri
+void printAvailableColor();						//stampa i colori disponibili
+void registerPlayer();							//inserisce il giocatore nella coda
+int rollDice();									//tira il dado (1-6)
+void setPlayers(struct Player* queue);
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
+//struct Coord startPosition = { 1, 0, 0 };
 
 int main() {
 
@@ -70,7 +73,13 @@ int main() {
 				system("pause");
 			}
 			else {
+				setPlayers(queue);
 				drawMapGame(queue);
+				system("pause");
+				prepareNumberCells(cells);
+				for (int i = 0; i < 10; i++)
+					for (int j = 0; j < 10; j++)
+						printf("%d\n", cells[i][j].coords.numberCell);
 				system("pause");
 
 			}
@@ -121,6 +130,7 @@ _Bool checkFreeColor(short int color) {
 void drawMapGame(struct Player* queue) {
 	_Bool flag = false;
 	int number = 0;
+
 	for (int i = 0; i < 10; i++) {
 		if (i == 0)
 			printf(" _____");
@@ -131,7 +141,7 @@ void drawMapGame(struct Player* queue) {
 	}
 	puts("_");				//prima riga disegnata
 
-	short int indexX = 0, indexY = 0;
+	short int indexX = 0, indexY = 0, x = 0, y = 0;
 
 	for (int k = 0; k < 10; k++) {
 		for (int j = 0; j < 3; j++) {
@@ -144,17 +154,21 @@ void drawMapGame(struct Player* queue) {
 				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
 					if (j == 0) {
 						flag = true;
+
+									//sostituire con il procedimento inverso, stampare la matrice di number
 						printf("|%5d", ++number);
-						cells[indexX][indexY++].numberCell = number;		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
+						cells[indexX][indexY].coords.numberCell = number;		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						flag = false;
-
+						indexY = 0;
 						while (tmp != NULL) {
 
-							if (getCoords(tmp->coords, tmp).x == 0)
+							if (cells[x][y++].coords.numberCell == queue->coords.numberCell)
 								printf("|  %s%c  "reset, getColorCode(tmp->color), 254);
+							else
+								printf("|     ");
 							tmp = tmp->next;
 						}
 
@@ -162,10 +176,8 @@ void drawMapGame(struct Player* queue) {
 						printf("|     ");
 				}
 			}
-			if (flag) {
-				indexY = 0;
-				indexX += 1;
-			}
+			x += 1;
+			y = 0;
 			puts("|");
 		}
 	}
@@ -242,6 +254,31 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
+void prepareNumberCells(struct Cell cells[10][10]) {
+	int x = 0, y = 0, number = 0;
+	_Bool flag = true;
+	
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			if (y == 0)					//problemi
+				flag = true;					//problemi					//problemi
+			if (y == 9)					//problemi
+				flag = false;					//problemi					//problemi
+			//problemi
+			if (flag) {					//problemi
+				number += 1;					//problemi
+				y++;
+			}					//problemi					//problemi
+			else {					//problemi					//problemi
+				number += 1;					//problemi
+				y--;					//problemi
+			}					//problemi					//problemi					//problemi
+			cells[x][y].coords.numberCell = number;					//problemi
+		}					//problemi
+		x++;					//problemi
+	}
+}
+
 void printAvailableColor(struct Player* queue) {
 	struct Player* tmp = queue;
 	int colors[7] = { 0 };
@@ -299,8 +336,6 @@ void registerPlayer() {
 
 			queue->id = 1;
 			queue->color = tmpColor;
-			queue->coords.x = 0;
-			queue->coords.y = 0;
 			queue->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
 		}
 		else {		//se invece il primo elemento già esiste allora esegue un push
@@ -313,4 +348,15 @@ int rollDice() {
 	srand(time(NULL));
 
 	return rand() % 6 + 1;
+}
+
+void setPlayers(struct Player* queue) {
+
+	while (queue != NULL) {
+		queue->coords.numberCell = 1;
+		queue->coords.x = 0;
+		queue->coords.y = 0;
+		queue = queue->next;
+	}
+
 }
