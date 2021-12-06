@@ -30,7 +30,8 @@ void printAvailableColor();					//stampa i colori disponibili
 void registerPlayer();						//inserisce il giocatore nella coda
 int rollDice();								//tira il dado (1-6)
 
-struct Player* head = NULL;
+struct Player* queue = NULL;
+struct Cell cells[10][10] = { 0 };
 
 int main() {
 
@@ -64,11 +65,13 @@ int main() {
 
 		switch (oper) {
 		case 1: {
-			if (getNumberPlayer() <= 1) {
+			if (getNumberPlayer() == -1) {
 				printf("%sErrore -> Devi inserire almeno due giocatori per poter giocare.\n"reset, getColorCode(1));
 				system("pause");
 			}
 			else {
+				drawMapGame(queue);
+				system("pause");
 
 			}
 			break;
@@ -79,7 +82,7 @@ int main() {
 			break;
 		}
 		case 3: {
-			printAllElement(head);
+			printQueueAllElement(queue);
 			system("pause");
 			break;
 		}
@@ -103,7 +106,7 @@ int main() {
 }
 
 _Bool checkFreeColor(short int color) {
-	struct Player* tmp = head;
+	struct Player* tmp = queue;
 
 	while (tmp != NULL) {
 		if (tmp->color == color) {
@@ -113,6 +116,59 @@ _Bool checkFreeColor(short int color) {
 		tmp = tmp->next;
 	}
 	return true;
+}
+
+void drawMapGame(struct Player* queue) {
+	_Bool flag = false;
+	int number = 0;
+	for (int i = 0; i < 10; i++) {
+		if (i == 0)
+			printf(" _____");
+		else if (i == 9)
+			printf("_____");
+		else
+			printf("______");
+	}
+	puts("_");				//prima riga disegnata
+
+	short int indexX = 0, indexY = 0;
+
+	for (int k = 0; k < 10; k++) {
+		for (int j = 0; j < 3; j++) {
+			if (j == 2) {
+				for (int i = 0; i < 10; i++) {
+					printf("|_____");
+				}
+			}
+			else {
+				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
+					if (j == 0) {
+						flag = true;
+						printf("|%5d", ++number);
+						cells[indexX][indexY++].numberCell = number;		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
+					}
+					else if (j == 1) {		//sono al centro della casella
+						struct Player* tmp = queue;
+						flag = false;
+
+						while (tmp != NULL) {
+
+							if (getCoords(tmp->coords, tmp).x == 0)
+								printf("|  %s%c  "reset, getColorCode(tmp->color), 254);
+							tmp = tmp->next;
+						}
+
+					}else
+						printf("|     ");
+				}
+			}
+			if (flag) {
+				indexY = 0;
+				indexX += 1;
+			}
+			puts("|");
+		}
+	}
 }
 
 void drawMenu() {
@@ -176,7 +232,7 @@ char* getColorCode(int value) {
 
 int getNumberPlayer() {
 	int tmpNumber = 0;
-	struct Player* tmp = head;		//salvo una copia della testa della lista
+	struct Player* tmp = queue;		//salvo una copia della testa della lista
 
 	while (tmp != NULL) {
 		tmpNumber = tmp->id;
@@ -186,8 +242,8 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
-void printAvailableColor(struct Player* head) {
-	struct Player* tmp = head;
+void printAvailableColor(struct Player* queue) {
+	struct Player* tmp = queue;
 	int colors[7] = { 0 };
 
 	for (int i = 0; i < sizeof(colors) / sizeof(int); i++)
@@ -215,7 +271,7 @@ void registerPlayer() {
 	short int tmpId = 0;
 	short int tmpColor = 0;
 
-	struct Player* tmp = head;
+	struct Player* tmp = queue;
 	while (tmp != NULL) {
 		tmpId = tmp->id + 1;			//preleva l'id dall ultimo elemento della lista e lo incrementa
 		tmp = tmp->next;
@@ -228,7 +284,7 @@ void registerPlayer() {
 		printf("Scegli il colore del giocatore!\n");
 
 		do {
-			printAvailableColor(head);
+			printAvailableColor(queue);
 			scanf(" %hd", &tmpColor);
 			
 			if (tmpColor >= 7 || tmpColor <= 0) {
@@ -238,15 +294,17 @@ void registerPlayer() {
 				flag = checkFreeColor(tmpColor);
 		} while (!flag);
 
-		if (head == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
-			head = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
+		if (queue == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
+			queue = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
 
-			head->id = 1;
-			head->color = tmpColor;
-			head->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
+			queue->id = 1;
+			queue->color = tmpColor;
+			queue->coords.x = 0;
+			queue->coords.y = 0;
+			queue->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
 		}
 		else {		//se invece il primo elemento già esiste allora esegue un push
-			pushElement(head, tmpId, tmpColor);
+			pushQueueElement(queue, tmpId, tmpColor);
 		}
 	}
 }
