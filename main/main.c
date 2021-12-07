@@ -26,7 +26,7 @@ void drawMenu();								//disegna il menu principale
 char* getColor(int);							//prende il nome del colore assegnato ad un valore intero
 char* getColorCode(int);						//prende il codice del colore per disegnarlo nel terminale
 int getNumberPlayer();							//prende il numero dei giocatori
-void prepareNumberCells(struct Cell*);		//prepara la matrice con i numeri
+void prepareNumberCells();		//prepara la matrice con i numeri
 void printAvailableColor();						//stampa i colori disponibili
 void registerPlayer();							//inserisce il giocatore nella coda
 int rollDice();									//tira il dado (1-6)
@@ -68,19 +68,21 @@ int main() {
 
 		switch (oper) {
 		case 1: {
+
 			if (getNumberPlayer() == -1) {
 				printf("%sErrore -> Devi inserire almeno due giocatori per poter giocare.\n"reset, getColorCode(1));
 				system("pause");
 			}
 			else {
 				setPlayers(queue);
+				prepareNumberCells();
 				drawMapGame(queue);
 				system("pause");
-				prepareNumberCells(cells);
-				for (int i = 0; i < 10; i++)
-					for (int j = 0; j < 10; j++)
-						printf("%d\n", cells[i][j].coords.numberCell);
-				system("pause");
+
+				//for (int i = 0; i < 10; i++)
+				//	for (int j = 0; j < 10; j++)
+				//		printf("%d\n", cells[i][j].coords.numberCell);
+				//system("pause");
 
 			}
 			break;
@@ -142,45 +144,58 @@ void drawMapGame(struct Player* queue) {
 	puts("_");				//prima riga disegnata
 
 	short int indexX = 0, indexY = 0, x = 0, y = 0;
+	char start = 192, midCorner = 193, mid = 196, endChar = 217;
 
 	for (int k = 0; k < 10; k++) {
 		for (int j = 0; j < 3; j++) {
 			if (j == 2) {
 				for (int i = 0; i < 10; i++) {
-					printf("|_____");
+					if (k != 9)
+						printf("|_____");			//stampa l'ultima riga di ogni cella
+					else if (k == 9)
+						printf("|     ");
 				}
 			}
 			else {
 				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
 					if (j == 0) {
 						flag = true;
-
-									//sostituire con il procedimento inverso, stampare la matrice di number
-						printf("|%5d", ++number);
-						cells[indexX][indexY].coords.numberCell = number;		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
+						printf("|%5d", cells[indexX][indexY++].coords.numberCell);		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						flag = false;
-						indexY = 0;
-						while (tmp != NULL) {
 
-							if (cells[x][y++].coords.numberCell == queue->coords.numberCell)
-								printf("|  %s%c  "reset, getColorCode(tmp->color), 254);
-							else
-								printf("|     ");
-							tmp = tmp->next;
-						}
+						if (tmp->coords.numberCell == cells[x][y++].coords.numberCell)
+							printf("|  %s%c  "reset, getColorCode(tmp->color), 254);		//se cè un colore stampo un colore
+						else
+							printf("|     ");					//se non cè stampo vuoto
 
-					}else
-						printf("|     ");
+					}
+
 				}
 			}
-			x += 1;
-			y = 0;
+			if (flag) {
+				indexY = 0;
+				indexX += 1;
+			}
+			else if (!flag) {
+				x++;
+				y = 0;
+			}
 			puts("|");
 		}
 	}
+
+	for (int i = 0; i < 10; i++) {
+		if (i == 0)
+			printf("%c%c%c%c%c%c", start, mid, mid, mid, mid, mid);
+		else if (i == 9)
+			printf("%c%c%c%c%c%c%c\n", midCorner, mid, mid, mid, mid, mid, endChar);
+		else
+			printf("%c%c%c%c%c%c", midCorner, mid, mid, mid, mid, mid);
+	}
+
 }
 
 void drawMenu() {
@@ -254,28 +269,33 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
-void prepareNumberCells(struct Cell cells[10][10]) {
+void prepareNumberCells() {
 	int x = 0, y = 0, number = 0;
 	_Bool flag = true;
 	
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
-			if (y == 0)					//problemi
-				flag = true;					//problemi					//problemi
-			if (y == 9)					//problemi
-				flag = false;					//problemi					//problemi
-			//problemi
-			if (flag) {					//problemi
-				number += 1;					//problemi
+			if (y == -1) {
+				flag = true;
 				y++;
-			}					//problemi					//problemi
-			else {					//problemi					//problemi
-				number += 1;					//problemi
-				y--;					//problemi
-			}					//problemi					//problemi					//problemi
-			cells[x][y].coords.numberCell = number;					//problemi
-		}					//problemi
-		x++;					//problemi
+			}
+			if (y == 10) {
+				flag = false;
+				y--;
+			}
+
+			number += 1;
+			cells[x][y].coords.numberCell = number;
+			
+			if (flag) {
+				y++;
+			}
+			else {
+				y--;
+			}
+			
+		}
+		x++;
 	}
 }
 
