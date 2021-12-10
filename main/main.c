@@ -26,11 +26,11 @@ void drawMenu();								//disegna il menu principale
 char* getColor(int);							//prende il nome del colore assegnato ad un valore intero
 char* getColorCode(int);						//prende il codice del colore per disegnarlo nel terminale
 int getNumberPlayer();							//prende il numero dei giocatori
-void prepareNumberCells();		//prepara la matrice con i numeri
+void prepareNumberCells();						//prepara la matrice con i numeri
 void printAvailableColor();						//stampa i colori disponibili
 void registerPlayer();							//inserisce il giocatore nella coda
 int rollDice();									//tira il dado (1-6)
-void setPlayers(struct Player* queue);
+void setPlayers(struct Player* queue);			//start position of player
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
@@ -78,11 +78,6 @@ int main() {
 				prepareNumberCells();
 				drawMapGame(queue);
 				system("pause");
-
-				//for (int i = 0; i < 10; i++)
-				//	for (int j = 0; j < 10; j++)
-				//		printf("%d\n", cells[i][j].coords.numberCell);
-				//system("pause");
 
 			}
 			break;
@@ -158,21 +153,29 @@ void drawMapGame(struct Player* queue) {
 			}
 			else {
 				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
-					if (j == 0) {
+					if (j == 0) {			//prima riga in alto di ogni cella
 						flag = true;
 						printf("|%5d", cells[indexX][indexY++].coords.numberCell);		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						flag = false;
+						printf("|");
 
-						if (tmp->coords.numberCell == cells[x][y++].coords.numberCell)
-							printf("|  %s%c  "reset, getColorCode(tmp->color), 254);		//se cè un colore stampo un colore
-						else
-							printf("|     ");					//se non cè stampo vuoto
-
+						for (int i = 0; i < 5; i++) {
+							if (tmp != NULL) {
+								if (tmp->coords.numberCell == cells[x][y].coords.numberCell)
+									printf("%s%c"reset, getColorCode(tmp->color), 254);
+								else
+									printf(" ");
+								tmp = tmp->next;
+							}
+							else {
+								printf(" ");
+							}
+						}
+						y++;
 					}
-
 				}
 			}
 			if (flag) {
@@ -183,11 +186,11 @@ void drawMapGame(struct Player* queue) {
 				x++;
 				y = 0;
 			}
-			puts("|");
+			puts("|");		//inserisce l'ultima barra alla fine di ogni riga
 		}
 	}
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {		//stampa l'ultima riga della tabella con caratteri ascii particolari
 		if (i == 0)
 			printf("%c%c%c%c%c%c", start, mid, mid, mid, mid, mid);
 		else if (i == 9)
