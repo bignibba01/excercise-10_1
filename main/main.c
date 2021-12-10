@@ -138,43 +138,43 @@ void drawMapGame(struct Player* queue) {
 	}
 	puts("_");				//prima riga disegnata
 
-	short int indexX = 0, indexY = 0, x = 0, y = 0;
-	char start = 192, midCorner = 193, mid = 196, endChar = 217;
+	short int indexX = 0, indexY = 0, x = 0, y = 0;			//indici per la gestione dell' output delle celle
+	char start = 192, midCorner = 193, mid = 196, endChar = 217;		//caratteri ASCII per disegnare la tabella
 
-	for (int k = 0; k < 10; k++) {
-		for (int j = 0; j < 3; j++) {
-			if (j == 2) {
+	for (int k = 0; k < 10; k++) {			//ciclo for per ogni colonna
+		for (int j = 0; j < 3; j++) {		//ciclo for per le 3 righe di ogni cella
+			if (j == 2) {					//ultima riga di ogni cella
 				for (int i = 0; i < 10; i++) {
 					if (k != 9)
 						printf("|_____");			//stampa l'ultima riga di ogni cella
-					else if (k == 9)
+					else if (k == 9)			//mi serve per chiudere l'ultima riga della tabella
 						printf("|     ");
 				}
 			}
 			else {
 				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
 					if (j == 0) {			//prima riga in alto di ogni cella
-						flag = true;
-						printf("|%5d", cells[indexX][indexY++].coords.numberCell);		//salvo il valore della cella nella matrice per conoscere la cella di destinazione
+						flag = true;		//flag per incrementare gli indici della matrice di output
+						printf("|%5d", cells[indexX][indexY++].coords.numberCell);			//stampo il numero della cella		
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						flag = false;
-						printf("|");
+						printf("|");		//stampo il corpo della tabella
 
-						for (int i = 0; i < 5; i++) {
+						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
 							if (tmp != NULL) {
-								if (tmp->coords.numberCell == cells[x][y].coords.numberCell)
+								if (tmp->coords.numberCell == cells[x][y].coords.numberCell)		//se coincidono i numeri della cella allora stampa il quadratino
 									printf("%s%c"reset, getColorCode(tmp->color), 254);
 								else
-									printf(" ");
+									printf(" ");			//se non coincidono stampa uno spazio vuoto
 								tmp = tmp->next;
 							}
 							else {
-								printf(" ");
+								printf(" ");			//se la lista non contiene valori stampa vuoto
 							}
 						}
-						y++;
+						y++;			//incremento l'indice della matrice
 					}
 				}
 			}
