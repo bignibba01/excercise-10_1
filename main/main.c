@@ -34,7 +34,6 @@ void setPlayers(struct Player* queue);			//start position of player
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
-//struct Coord startPosition = { 1, 0, 0 };
 
 int main() {
 
