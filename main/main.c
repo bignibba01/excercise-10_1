@@ -77,7 +77,7 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				while (true) {
-					drawMapGame(queue);
+					drawMapGame();
 					startTurn(queue);
 					system("pause");
 
@@ -128,7 +128,7 @@ _Bool checkFreeColor(short int color) {
 	return true;
 }
 
-void drawMapGame(struct Player* queue) {
+void drawMapGame() {
 	_Bool flag = false;
 	int number = 0;
 
@@ -391,5 +391,5 @@ void setPlayers(struct Player* queue) {
 void startTurn(struct Player* queue) {
 	struct Player tmp;
 	tmp = popQueueFirstElement(&queue);
-	pushQueueElement(queue, tmp.id, tmp.color);
+	pushToTail(queue, tmp.id, tmp.color, tmp.coords.numberCell);
 }
