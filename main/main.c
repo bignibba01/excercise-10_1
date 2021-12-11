@@ -30,7 +30,8 @@ void prepareNumberCells();						//prepara la matrice con i numeri
 void printAvailableColor();						//stampa i colori disponibili
 void registerPlayer();							//inserisce il giocatore nella coda
 int rollDice();									//tira il dado (1-6)
-void setPlayers(struct Player* queue);			//start position of player
+void setPlayers(struct Player*);				//start position of player
+void startTurn(struct Player*);					//gestisce il turno dei giocatori
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
@@ -75,8 +76,12 @@ int main() {
 			else {
 				setPlayers(queue);
 				prepareNumberCells();
-				drawMapGame(queue);
-				system("pause");
+				while (true) {
+					drawMapGame(queue);
+					startTurn(queue);
+					system("pause");
+
+				}
 
 			}
 			break;
@@ -381,4 +386,10 @@ void setPlayers(struct Player* queue) {
 		queue = queue->next;
 	}
 
+}
+
+void startTurn(struct Player* queue) {
+	struct Player tmp;
+	tmp = popQueueFirstElement(&queue);
+	pushQueueElement(queue, tmp.id, tmp.color);
 }

@@ -22,7 +22,7 @@ struct Player {		//player entity
 };
 
 struct Coord getCoords(struct Coord);
-void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
+struct Player popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
 
@@ -32,16 +32,19 @@ void pushQueueElement(struct Player*, short int, short int);				//aggiunge un va
 // 	return coord;
 // }
 
-void popQueueFirstElement(struct Player** head) {
+struct Player popQueueFirstElement(struct Player** head) {
 	struct Player* next_node = NULL;
+	struct Player tmp;
 
 	if (*head == NULL) {
-		return -1;
+		return;
 	}
 
 	next_node = (*head)->next;
+	tmp = **head;
 	free(*head);
 	*head = next_node;
+	return tmp;
 }
 
 void printQueueAllElement(struct Player* head) {
