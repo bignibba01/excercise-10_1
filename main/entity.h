@@ -26,11 +26,11 @@ void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa de
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
 
-struct Coord getCoords(struct Coord coord, struct Player* player) {
-	coord.x = player->coords.x;
-	coord.y = player->coords.y;
-	return coord;
-}
+// struct Coord getCoords(struct Coord coord, struct Player* player) {
+// 	coord.x = player->coords.x;
+// 	coord.y = player->coords.y;
+// 	return coord;
+// }
 
 void popQueueFirstElement(struct Player** head) {
 	struct Player* next_node = NULL;
