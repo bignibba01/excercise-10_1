@@ -37,6 +37,7 @@ struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
 
 int main() {
+	srand(time(NULL));
 
 #ifdef NEED_COLOR_FIX				//procedimento per abilitare i colori su windows
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -77,13 +78,19 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				while (true) {
-					struct Player tryMeem = tryPop(&queue);
+					drawMapGame(queue);			//disegna la mappa di gioco
+					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
 
-					drawMapGame(queue);
-					printf("%d\nGGG\n", tryMeem.id);
+					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
+					printf("Tira il dado! ");
+					system("pause");
+					int number = rollDice();
 
-					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);
-					getchar();
+					tryMeem.coords.numberCell += number;
+
+					printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
+
+					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
 				}
 			}
@@ -132,7 +139,6 @@ _Bool checkFreeColor(short int color) {
 }
 
 void defineCellStatus(){
-	srand(time(NULL));
 	int num = 0, casella = 0, x = 0, y = 0;
 
 	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti e indietro che saranno presenti nel tabellone
@@ -407,8 +413,13 @@ void registerPlayer() {
 }
 
 int rollDice() {
-	srand(time(NULL));
+	
+	time_t start = clock(), current = 0;
 
+	do {
+		printf("%d\r", rand() % 6 + 1);
+		current = clock();
+	} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);
 	return rand() % 6 + 1;
 }
 
