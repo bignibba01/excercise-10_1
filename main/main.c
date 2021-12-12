@@ -76,8 +76,12 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				while (true) {
-				drawMapGame(queue);
-				system("pause");
+					drawMapGame(queue);
+					struct Player tryMeem = tryPop(&queue);
+					printf("%d\nGGG\n", tryMeem.id);
+					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);
+					//printQueueAllElement(queue);
+					system("pause");
 
 				}
 

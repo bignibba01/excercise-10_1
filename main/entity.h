@@ -25,6 +25,8 @@ struct Coord getCoords(struct Coord);
 void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
+void pushTurnQueue(struct Player*, short int, short int, short int);
+struct Player tryPop(struct Player**);
 
 struct Coord getCoords(struct Coord coord, struct Player* player) {
 	coord.x = player->coords.x;
@@ -51,6 +53,21 @@ void printQueueAllElement(struct Player* head) {
 	}
 }
 
+struct Player tryPop(struct Player** head) {
+	struct Player* next_node = NULL;
+	struct Player tryMeme;
+
+	if (*head == NULL) {
+		return;
+	}
+
+	next_node = (*head)->next;
+	tryMeme = **head;
+	free(*head);
+	*head = next_node;
+	return tryMeme;
+}
+
 void pushQueueElement(struct Player* head, short int id, short int color) {
 
 	while (head->next != NULL) {
@@ -60,6 +77,19 @@ void pushQueueElement(struct Player* head, short int id, short int color) {
 	head->next = (struct Player*)malloc(sizeof(struct Player));
 	head->next->id = id;
 	head->next->color = color;
+	head->next->next = NULL;
+}
+
+void pushTurnQueue(struct Player* head, short int id, short int color, short int number) {
+
+	while (head->next != NULL) {
+		head = head->next;
+	}
+
+	head->next = (struct Player*)malloc(sizeof(struct Player));
+	head->next->id = id;
+	head->next->color = color;
+	head->next->coords.numberCell = number;
 	head->next->next = NULL;
 }
 
