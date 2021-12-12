@@ -13,11 +13,11 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #include "entity.h"
 
 #ifdef __MINGW32__
-	#define NEED_COLOR_FIX
+#define NEED_COLOR_FIX
 #endif
 #ifdef NEED_COLOR_FIX
-	#include <windows.h>
-	#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#include <windows.h>
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
 _Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
@@ -30,15 +30,14 @@ void prepareNumberCells();						//prepara la matrice con i numeri
 void printAvailableColor();						//stampa i colori disponibili
 void registerPlayer();							//inserisce il giocatore nella coda
 int rollDice();									//tira il dado (1-6)
-void setPlayers(struct Player*);				//start position of player
-void startTurn(struct Player*);					//gestisce il turno dei giocatori
+void setPlayers(struct Player* queue);			//start position of player
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
 
 int main() {
 
-	#ifdef NEED_COLOR_FIX				//procedimento per abilitare i colori su windows
+#ifdef NEED_COLOR_FIX				//procedimento per abilitare i colori su windows
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (handle != INVALID_HANDLE_VALUE) {
 		DWORD mode = 0;
@@ -47,7 +46,7 @@ int main() {
 			SetConsoleMode(handle, mode);
 		}
 	}
-	#endif
+#endif
 
 	while (true) {
 		_Bool end = false;		//esce dal ciclo continuo
@@ -69,7 +68,7 @@ int main() {
 		switch (oper) {
 		case 1: {
 
-			if (getNumberPlayer() == -1) {
+			if (getNumberPlayer() <= 1) {
 				printf("%sErrore -> Devi inserire almeno due giocatori per poter giocare.\n"reset, getColorCode(1));
 				system("pause");
 			}
@@ -77,15 +76,14 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				while (true) {
-					drawMapGame();
-					startTurn(queue);
-					system("pause");
+				drawMapGame(queue);
+				system("pause");
 
 				}
 
 			}
 			break;
-			}
+		}
 		case 2: {
 			registerPlayer();
 			system("pause");
@@ -109,7 +107,7 @@ int main() {
 			break;		//esce dal ciclo continuo
 
 		system("cls");
-		
+
 	}
 
 	return 0;
@@ -128,7 +126,7 @@ _Bool checkFreeColor(short int color) {
 	return true;
 }
 
-void drawMapGame() {
+void drawMapGame(struct Player* queue) {
 	_Bool flag = false;
 	int number = 0;
 
@@ -279,7 +277,7 @@ int getNumberPlayer() {
 void prepareNumberCells() {
 	int x = 0, y = 0, number = 0;
 	_Bool flag = true;
-	
+
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
 			if (y == -1) {
@@ -293,14 +291,14 @@ void prepareNumberCells() {
 
 			number += 1;
 			cells[x][y].coords.numberCell = number;
-			
+
 			if (flag) {
 				y++;
 			}
 			else {
 				y--;
 			}
-			
+
 		}
 		x++;
 	}
@@ -312,7 +310,7 @@ void printAvailableColor(struct Player* queue) {
 
 	for (int i = 0; i < sizeof(colors) / sizeof(int); i++)
 		colors[i] = i + 1;
-	
+
 	while (tmp != NULL) {
 
 		for (int i = 0; i < sizeof(colors) / sizeof(int); i++) {
@@ -350,11 +348,12 @@ void registerPlayer() {
 		do {
 			printAvailableColor(queue);
 			scanf(" %hd", &tmpColor);
-			
+
 			if (tmpColor >= 7 || tmpColor <= 0) {
 				flag = false;
 				printf("%sErrore -> Il valore non e' valido.\n"reset, getColorCode(1));
-			}else
+			}
+			else
 				flag = checkFreeColor(tmpColor);
 		} while (!flag);
 
@@ -386,10 +385,4 @@ void setPlayers(struct Player* queue) {
 		queue = queue->next;
 	}
 
-}
-
-void startTurn(struct Player* queue) {
-	struct Player tmp;
-	tmp = popQueueFirstElement(&queue);
-	pushToTail(queue, tmp.id, tmp.color, tmp.coords.numberCell);
 }
