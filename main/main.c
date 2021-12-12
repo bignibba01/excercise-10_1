@@ -1,6 +1,6 @@
 /*
 Si scriva un programma C, adeguatamente commentato, per la generazione di partite del "Gioco dell'oca" (Snakes & Ladders nella versione inglese).
-Il gioco consistente nel far competere pi� giocatori al raggiungimento della casella finale, avanzando di volta in volta tra caselle diverse tramite il tiro di un dado a 6 facce.
+Il gioco consistente nel far competere più giocatori al raggiungimento della casella finale, avanzando di volta in volta tra caselle diverse tramite il tiro di un dado a 6 facce.
 ---MORE INFO ONLINE---
 */
 
@@ -20,7 +20,7 @@ Il gioco consistente nel far competere pi� giocatori al raggiungimento della c
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore � gia stato selezionato
+_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();
 void drawMapGame();								//disegna la mappa di gioco
 void drawMenu();								//disegna il menu principale
@@ -190,7 +190,7 @@ void drawMapGame(struct Player* queue) {
 				}
 			}
 			else {
-				for (int i = 0; i < 10; i++) {		//draw 10 cells, j � il numero della riga della casella
+				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
 					if (j == 0) {			//prima riga in alto di ogni cella
 						flag = true;		//flag per incrementare gli indici della matrice di output
 						printf("|%5d", cells[indexX][indexY++].coords.numberCell);			//stampo il numero della cella
@@ -393,14 +393,14 @@ void registerPlayer() {
 				flag = checkFreeColor(tmpColor);
 		} while (!flag);
 
-		if (queue == NULL) {			//se il primo elemento della lista � nullo allora inserisce il primo valore
+		if (queue == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
 			queue = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
 
 			queue->id = 1;
 			queue->color = tmpColor;
 			queue->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
 		}
-		else {		//se invece il primo elemento gi� esiste allora esegue un push
+		else {		//se invece il primo elemento già esiste allora esegue un push
 			pushQueueElement(queue, tmpId, tmpColor);
 		}
 	}
