@@ -28,12 +28,6 @@ void pushQueueElement(struct Player*, short int, short int);				//aggiunge un va
 void pushTurnQueue(struct Player*, short int, short int, short int);
 struct Player tryPop(struct Player**);
 
-struct Coord getCoords(struct Coord coord, struct Player* player) {
-	coord.x = player->coords.x;
-	coord.y = player->coords.y;
-	return coord;
-}
-
 void popQueueFirstElement(struct Player** head) {
 	struct Player* next_node = NULL;
 

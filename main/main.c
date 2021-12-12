@@ -1,6 +1,6 @@
 /*
 Si scriva un programma C, adeguatamente commentato, per la generazione di partite del "Gioco dell'oca" (Snakes & Ladders nella versione inglese).
-Il gioco consistente nel far competere più giocatori al raggiungimento della casella finale, avanzando di volta in volta tra caselle diverse tramite il tiro di un dado a 6 facce.
+Il gioco consistente nel far competere piï¿½ giocatori al raggiungimento della casella finale, avanzando di volta in volta tra caselle diverse tramite il tiro di un dado a 6 facce.
 ---MORE INFO ONLINE---
 */
 
@@ -20,7 +20,8 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della cas
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
+_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore ï¿½ gia stato selezionato
+void defineCellStatus();
 void drawMapGame();								//disegna la mappa di gioco
 void drawMenu();								//disegna il menu principale
 char* getColor(int);							//prende il nome del colore assegnato ad un valore intero
@@ -76,15 +77,15 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				while (true) {
-					drawMapGame(queue);
 					struct Player tryMeem = tryPop(&queue);
+
+					drawMapGame(queue);
 					printf("%d\nGGG\n", tryMeem.id);
+
 					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);
-					//printQueueAllElement(queue);
+					getchar();
 					system("pause");
-
 				}
-
 			}
 			break;
 		}
@@ -130,6 +131,38 @@ _Bool checkFreeColor(short int color) {
 	return true;
 }
 
+void defineCellStatus(){
+	srand(time(NULL));
+	int num = 0, casella = 0, x = 0, y = 0;
+
+	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti e indietro che saranno presenti nel tabellone
+		_Bool flag = false;
+
+		casella = rand()% 100 + 1;						//numero casuale da 1 a 100 compresi
+
+		for (int j = 0; j < 10; j++){
+			for (int k = 0; k < 10; k++)
+				if (cells[j][k].coords.numberCell == casella){
+					x = j;
+					y = k;
+					flag = true;
+					break;
+				}
+				if (flag)					//se ha trovato la casella esce dai cicli
+					break;
+		}
+		int sum = cells[x][y].coords.numberCell + num;
+		num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
+		if (sum <= 100 && sum >= 1)
+			cells[x][y].jumptoBox = sum;
+
+
+
+
+	}
+
+}
+
 void drawMapGame(struct Player* queue) {
 	_Bool flag = false;
 	int number = 0;
@@ -158,10 +191,10 @@ void drawMapGame(struct Player* queue) {
 				}
 			}
 			else {
-				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
+				for (int i = 0; i < 10; i++) {		//draw 10 cells, j ï¿½ il numero della riga della casella
 					if (j == 0) {			//prima riga in alto di ogni cella
 						flag = true;		//flag per incrementare gli indici della matrice di output
-						printf("|%5d", cells[indexX][indexY++].coords.numberCell);			//stampo il numero della cella		
+						printf("|%5d", cells[indexX][indexY++].coords.numberCell);			//stampo il numero della cella
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
@@ -171,7 +204,7 @@ void drawMapGame(struct Player* queue) {
 						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
 							if (tmp != NULL) {
 								if (tmp->coords.numberCell == cells[x][y].coords.numberCell)		//se coincidono i numeri della cella allora stampa il quadratino
-									printf("%s%c"reset, getColorCode(tmp->color), 254);
+									printf("%s%d"reset, getColorCode(tmp->color), tmp->id);
 								else
 									printf(" ");			//se non coincidono stampa uno spazio vuoto
 								tmp = tmp->next;
@@ -361,14 +394,14 @@ void registerPlayer() {
 				flag = checkFreeColor(tmpColor);
 		} while (!flag);
 
-		if (queue == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
+		if (queue == NULL) {			//se il primo elemento della lista ï¿½ nullo allora inserisce il primo valore
 			queue = (struct Player*)malloc(sizeof(struct Player));			//alloca lo spazio
 
 			queue->id = 1;
 			queue->color = tmpColor;
 			queue->next = NULL;			//attribuisce al puntatore all elemento successivo il valore NULL perche ancora non esiste
 		}
-		else {		//se invece il primo elemento già esiste allora esegue un push
+		else {		//se invece il primo elemento giï¿½ esiste allora esegue un push
 			pushQueueElement(queue, tmpId, tmpColor);
 		}
 	}
