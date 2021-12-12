@@ -136,10 +136,9 @@ void defineCellStatus(){
 	int num = 0, casella = 0, x = 0, y = 0;
 
 	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti e indietro che saranno presenti nel tabellone
-		_Bool flag = false;
+		_Bool flag = false, valid = false;
 
 		casella = rand()% 100 + 1;						//numero casuale da 1 a 100 compresi
-
 		for (int j = 0; j < 10; j++){
 			for (int k = 0; k < 10; k++)
 				if (cells[j][k].coords.numberCell == casella){
@@ -152,15 +151,15 @@ void defineCellStatus(){
 					break;
 		}
 		int sum = cells[x][y].coords.numberCell + num;
-		num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
-		if (sum <= 100 && sum >= 1)
-			cells[x][y].jumptoBox = sum;
 
-
-
-
+		while (!valid){
+			num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
+			if (sum <= 100 && sum >= 1){
+				cells[x][y].jumptoBox = sum;
+				valid = true;
+			}
+		}
 	}
-
 }
 
 void drawMapGame(struct Player* queue) {
