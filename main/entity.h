@@ -6,7 +6,7 @@
 struct Coord {
 	short int numberCell;			//per facilitare il salto salta direttamente nella casella numerata
 	short int x;		//indice x
-	short int y;		//indice y
+	short int y;		//indice yds
 };
 
 struct Cell {
