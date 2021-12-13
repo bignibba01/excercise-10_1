@@ -145,10 +145,12 @@ void defineCellStatus(){
 
 	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
 		_Bool flag = false;
-		int x = 0, y = 0;
+		int x = 0, y = 0, cont = 0;
 
 		while (true) {
-			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
+			
+			casella = rand() % (99 - 2) + 2;
+
 			for (int j = 0; j < 10; j++) {
 				for (int k = 0; k < 10; k++)
 					if (cells[j][k].coords.numberCell == casella) {
@@ -162,6 +164,8 @@ void defineCellStatus(){
 			}
 			if (cells[x][y].status == 0)			//se status è 0 vuol dire che le caselle non hanno alcuna azione
 				break;
+			if (cont++ == 5)			///limite per cercare una casella
+				break;
 		}
 		cells[x][y].status = -1;			//-1 vuol dire che il giocatore salterà un turno
 
@@ -169,7 +173,7 @@ void defineCellStatus(){
 
 	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
 		_Bool flag = false;
-		int x = 0, y = 0;
+		int x = 0, y = 0, cont = 0;
 
 		while (true) {
 			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
@@ -186,8 +190,10 @@ void defineCellStatus(){
 			}
 			if (cells[x][y].status == 0 && casella < 70)
 				break;
+			if (cont++ == 5)			///limite per cercare una casella
+				break;
 		}
-
+		cont = 0;
 		while (true){
 			num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
 			int sum = cells[x][y].coords.numberCell + num;
@@ -196,12 +202,14 @@ void defineCellStatus(){
 				cells[x][y].status = 2;				//2 vuol dire che farà dei salti
 				break;
 			}
+			if (cont++ == 5)			///limite per cercare una casella
+				break;
 		}
 	}//FINE caselle che saltano avanti
 
 	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti indietro che saranno presenti nel tabellone
 		_Bool flag = false;
-		int x = 0, y = 0;
+		int x = 0, y = 0, cont = 0;
 
 		while (true) {
 			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
@@ -219,8 +227,10 @@ void defineCellStatus(){
 			}
 			if (cells[x][y].status == 0 && casella > 26)
 				break;
+			if (cont++ == 5)			///limite per cercare una casella
+				break;
 		}
-
+		cont = 0;
 		while (true) {
 			num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
 			int diff = cells[x][y].coords.numberCell - num;
@@ -229,6 +239,8 @@ void defineCellStatus(){
 				cells[x][y].status = 1;						//1 vuol dire che farà dei salti indietro
 				break;
 			}
+			if (cont++ == 5)			///limite per cercare una casella
+				break;
 		}
 	}//FINE caselle che saltano indietro
 
