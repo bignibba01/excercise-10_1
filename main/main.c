@@ -141,10 +141,11 @@ _Bool checkFreeColor(short int color) {
 }
 
 void defineCellStatus(){
-	int num = 0, casella = 0, x = 0, y = 0;
+	int num = 0, casella = 0;
 
 	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
 		_Bool flag = false;
+		int x = 0, y = 0;
 
 		while (true) {
 			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
@@ -168,6 +169,7 @@ void defineCellStatus(){
 
 	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
 		_Bool flag = false;
+		int x = 0, y = 0;
 
 		while (true) {
 			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
@@ -199,9 +201,11 @@ void defineCellStatus(){
 
 	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti indietro che saranno presenti nel tabellone
 		_Bool flag = false;
+		int x = 0, y = 0;
 
 		while (true) {
 			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
+
 			for (int j = 0; j < 10; j++) {
 				for (int k = 0; k < 10; k++)
 					if (cells[j][k].coords.numberCell == casella) {
@@ -213,7 +217,7 @@ void defineCellStatus(){
 				if (flag)					//se ha trovato la casella esce dai cicli
 					break;
 			}
-			if (cells[x][y].status == 0 && casella > 26);
+			if (cells[x][y].status == 0 && casella > 26)
 				break;
 		}
 
