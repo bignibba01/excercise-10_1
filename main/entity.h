@@ -21,7 +21,6 @@ struct Player {		//player entity
 	struct Player* next;		//puntatore all elemento della lista successivo
 };
 
-struct Coord getCoords(struct Coord);
 void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori

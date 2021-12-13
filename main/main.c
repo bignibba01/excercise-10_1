@@ -218,7 +218,7 @@ void drawMapGame(struct Player* queue) {
 								printf(" ");			//se la lista non contiene valori stampa vuoto
 							}
 						}
-						y++;			//incremento l'indice della matrice
+						y++;
 					}
 				}
 			}
@@ -226,7 +226,7 @@ void drawMapGame(struct Player* queue) {
 				indexY = 0;
 				indexX += 1;
 			}
-			else if (!flag) {
+			else if (!flag && j == 1) {
 				x++;
 				y = 0;
 			}
@@ -414,19 +414,19 @@ void registerPlayer() {
 
 int rollDice() {
 	
-	time_t start = clock(), current = 0;
+	/*time_t start = clock(), current = 0;
 
 	do {
 		printf("%d\r", rand() % 6 + 1);
 		current = clock();
-	} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);
+	} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);*/
 	return rand() % 6 + 1;
 }
 
 void setPlayers(struct Player* queue) {
 
 	while (queue != NULL) {
-		queue->coords.numberCell = 1;
+		queue->coords.numberCell = 0;
 		queue->coords.x = 0;
 		queue->coords.y = 0;
 		queue = queue->next;
