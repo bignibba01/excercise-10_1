@@ -20,21 +20,22 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-_Bool checkFreeColor(short int);				//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
-void defineCellStatus();
-void drawMapGame();								//disegna la mappa di gioco
-void drawMenu();								//disegna il menu principale
-char* getColor(int);							//prende il nome del colore assegnato ad un valore intero
-char* getColorCode(int);						//prende il codice del colore per disegnarlo nel terminale
-int getNumberPlayer();							//prende il numero dei giocatori
-void prepareNumberCells();						//prepara la matrice con i numeri
-void printAvailableColor();						//stampa i colori disponibili
-void registerPlayer();							//inserisce il giocatore nella coda
-int rollDice();									//tira il dado (1-6)
-void setPlayers(struct Player* queue);			//start position of player
+_Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
+void defineCellStatus();									//definisce l' azione che le caselle compiono
+struct Coord drawMapGame(struct Player*, struct Player);		//disegna la mappa di gioco
+void drawMenu();											//disegna il menu principale
+char* getColor(int);										//prende il nome del colore assegnato ad un valore intero
+char* getColorCode(int);									//prende il codice del colore per disegnarlo nel terminale
+int getNumberPlayer();										//prende il numero dei giocatori
+void prepareNumberCells();									//prepara la matrice con i numeri
+void printAvailableColor();									//stampa i colori disponibili
+void registerPlayer();										//inserisce il giocatore nella coda
+int rollDice();												//tira il dado (1-6)
+void setPlayers(struct Player* queue);						//start position of player
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
+char *answerPath = "..\\File\\FileDomande.txt", *questionPath = "..\\File\\FileRisposte.txt";
 
 int main() {
 	srand(time(NULL));
@@ -75,15 +76,17 @@ int main() {
 				system("pause");
 			}
 			else {
+				struct Coord currentPlayer = { 0 };
 				setPlayers(queue);
 				prepareNumberCells();
 				defineCellStatus();
 
 				while (true) {
-					drawMapGame(queue);			//disegna la mappa di gioco
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
+					currentPlayer = drawMapGame(queue, tryMeem);			//disegna la mappa di gioco
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
+					printf("Posizione x: %d, posizione y: %d, numeroCasella: %d\n", currentPlayer.x, currentPlayer.y, currentPlayer.numberCell);
 					printf("Tira il dado! ");
 					system("pause");
 					int number = rollDice();
@@ -94,6 +97,7 @@ int main() {
 
 					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
+					system("cls");
 				}
 			}
 			break;
@@ -119,11 +123,8 @@ int main() {
 
 		if (end)
 			break;		//esce dal ciclo continuo
-
 		system("cls");
-
 	}
-
 	return 0;
 }
 
@@ -246,7 +247,8 @@ void defineCellStatus(){
 
 }
 
-void drawMapGame(struct Player* queue) {
+struct Coord drawMapGame(struct Player* queue, struct Player currentPlayer) {
+	struct Coord playerCoords = { 0 };
 	short int indexX = 0, indexY = 0, x = 0, y = 0;			//indici per la gestione dell' output delle celle
 	char start = 192, midCorner = 193, mid = 196, endChar = 217;		//caratteri ASCII per disegnare la tabella
 
@@ -294,8 +296,14 @@ void drawMapGame(struct Player* queue) {
 
 						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
 							if (tmp != NULL) {
-								if (tmp->coords.numberCell == cells[x][y].coords.numberCell)		//se coincidono i numeri della cella allora stampa il quadratino
+								if (tmp->coords.numberCell == cells[x][y].coords.numberCell) {		//se coincidono i numeri della cella allora stampa il quadratino
 									printf("%s%d"reset, getColorCode(tmp->color), tmp->id);
+									if (tmp->id == currentPlayer.id) {
+										playerCoords.numberCell = tmp->coords.numberCell;
+										playerCoords.x = tmp->coords.x;
+										playerCoords.y = tmp->coords.y;
+									}
+								}
 								else
 									printf(" ");			//se non coincidono stampa uno spazio vuoto
 								tmp = tmp->next;
@@ -328,7 +336,7 @@ void drawMapGame(struct Player* queue) {
 		else
 			printf("%c%c%c%c%c%c", midCorner, mid, mid, mid, mid, mid);
 	}
-
+	return playerCoords;
 }
 
 void drawMenu() {
