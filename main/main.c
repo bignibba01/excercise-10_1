@@ -77,6 +77,8 @@ int main() {
 			else {
 				setPlayers(queue);
 				prepareNumberCells();
+				defineCellStatus();
+
 				while (true) {
 					drawMapGame(queue);			//disegna la mappa di gioco
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
@@ -141,36 +143,96 @@ _Bool checkFreeColor(short int color) {
 void defineCellStatus(){
 	int num = 0, casella = 0, x = 0, y = 0;
 
-	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti e indietro che saranno presenti nel tabellone
-		_Bool flag = false, valid = false;
+	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
+		_Bool flag = false;
 
-		casella = rand()% 100 + 1;						//numero casuale da 1 a 100 compresi
-		for (int j = 0; j < 10; j++){
-			for (int k = 0; k < 10; k++)
-				if (cells[j][k].coords.numberCell == casella){
-					x = j;
-					y = k;
-					flag = true;
-					break;
-				}
+		while (true) {
+			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
+			for (int j = 0; j < 10; j++) {
+				for (int k = 0; k < 10; k++)
+					if (cells[j][k].coords.numberCell == casella) {
+						x = j;
+						y = k;
+						flag = true;
+						break;
+					}
 				if (flag)					//se ha trovato la casella esce dai cicli
 					break;
+			}
+			if (cells[x][y].status == 0)			//se status è 0 vuol dire che le caselle non hanno alcuna azione
+				break;
 		}
-		int sum = cells[x][y].coords.numberCell + num;
+		cells[x][y].status = -1;			//-1 vuol dire che il giocatore salterà un turno
 
-		while (!valid){
+	}//FINE caselle che saltano turni
+
+	for (int i = 0; i < 7; i++){					//7 per indicare il numero di salti in avanti che saranno presenti nel tabellone
+		_Bool flag = false;
+
+		while (true) {
+			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
+			for (int j = 0; j < 10; j++) {
+				for (int k = 0; k < 10; k++)
+					if (cells[j][k].coords.numberCell == casella) {
+						x = j;
+						y = k;
+						flag = true;
+						break;
+					}
+				if (flag)					//se ha trovato la casella esce dai cicli
+					break;
+			}
+			if (cells[x][y].status == 0 && casella < 70)
+				break;
+		}
+
+		while (true){
 			num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
+			int sum = cells[x][y].coords.numberCell + num;
 			if (sum <= 100 && sum >= 1){
 				cells[x][y].jumptoBox = sum;
-				valid = true;
+				cells[x][y].status = 2;				//2 vuol dire che farà dei salti
+				break;
 			}
 		}
-	}
+	}//FINE caselle che saltano avanti
+
+	for (int i = 0; i < 7; i++) {					//7 per indicare il numero di salti indietro che saranno presenti nel tabellone
+		_Bool flag = false;
+
+		while (true) {
+			casella = rand() % 100 + 1;						//numero casuale da 1 a 100 compresi
+			for (int j = 0; j < 10; j++) {
+				for (int k = 0; k < 10; k++)
+					if (cells[j][k].coords.numberCell == casella) {
+						x = j;
+						y = k;
+						flag = true;
+						break;
+					}
+				if (flag)					//se ha trovato la casella esce dai cicli
+					break;
+			}
+			if (cells[x][y].status == 0 && casella > 26);
+				break;
+		}
+
+		while (true) {
+			num = rand() % (26 - 5) + 5;				//numero casuale da 5 a 25 per definire il numero di caselle che salta il giocatore
+			int diff = cells[x][y].coords.numberCell - num;
+			if (diff <= 100 && diff >= 1) {
+				cells[x][y].jumptoBox = diff;
+				cells[x][y].status = 1;						//1 vuol dire che farà dei salti indietro
+				break;
+			}
+		}
+	}//FINE caselle che saltano indietro
+
 }
 
 void drawMapGame(struct Player* queue) {
-	_Bool flag = false;
-	int number = 0;
+	short int indexX = 0, indexY = 0, x = 0, y = 0;			//indici per la gestione dell' output delle celle
+	char start = 192, midCorner = 193, mid = 196, endChar = 217;		//caratteri ASCII per disegnare la tabella
 
 	for (int i = 0; i < 10; i++) {
 		if (i == 0)
@@ -181,9 +243,6 @@ void drawMapGame(struct Player* queue) {
 			printf("______");
 	}
 	puts("_");				//prima riga disegnata
-
-	short int indexX = 0, indexY = 0, x = 0, y = 0;			//indici per la gestione dell' output delle celle
-	char start = 192, midCorner = 193, mid = 196, endChar = 217;		//caratteri ASCII per disegnare la tabella
 
 	for (int k = 0; k < 10; k++) {			//ciclo for per ogni colonna
 		for (int j = 0; j < 3; j++) {		//ciclo for per le 3 righe di ogni cella
@@ -198,12 +257,23 @@ void drawMapGame(struct Player* queue) {
 			else {
 				for (int i = 0; i < 10; i++) {		//draw 10 cells, j è il numero della riga della casella
 					if (j == 0) {			//prima riga in alto di ogni cella
-						flag = true;		//flag per incrementare gli indici della matrice di output
-						printf("|%5d", cells[indexX][indexY++].coords.numberCell);			//stampo il numero della cella
+
+						if (cells[indexX][indexY].status == 0)					//indica una cella vuota, quindi il colore del numero sarà bianco
+							printf("|%s%5d"reset, getColorCode(7), cells[indexX][indexY].coords.numberCell);
+
+						else if (cells[indexX][indexY].status == -1)			//indica un salto di turno, quindi il colore del numero sarà rosso
+							printf("|%s%5d"reset, getColorCode(1), cells[indexX][indexY].coords.numberCell);
+
+						else if (cells[indexX][indexY].status == 1)				//indica un salto indietro, quindi il colore del numero sarà giallo
+							printf("|%s%5d"reset, getColorCode(3), cells[indexX][indexY].coords.numberCell);
+
+						else if (cells[indexX][indexY].status == 2)				//indica un salto in avanti, quindi il colore del numero sarà verde
+							printf("|%s%5d"reset, getColorCode(2), cells[indexX][indexY].coords.numberCell);
+
+						indexY++;				//incremento il suo indice
 					}
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
-						flag = false;
 						printf("|");		//stampo il corpo della tabella
 
 						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
@@ -222,11 +292,11 @@ void drawMapGame(struct Player* queue) {
 					}
 				}
 			}
-			if (flag) {
+			if (j == 0) {
 				indexY = 0;
 				indexX += 1;
 			}
-			else if (!flag && j == 1) {
+			else if (j == 1) {
 				x++;
 				y = 0;
 			}
@@ -333,6 +403,7 @@ void prepareNumberCells() {
 
 			number += 1;
 			cells[x][y].coords.numberCell = number;
+			cells[x][y].status = 0;
 
 			if (flag) {
 				y++;
@@ -426,7 +497,7 @@ int rollDice() {
 void setPlayers(struct Player* queue) {
 
 	while (queue != NULL) {
-		queue->coords.numberCell = 0;
+		queue->coords.numberCell = 1;
 		queue->coords.x = 0;
 		queue->coords.y = 0;
 		queue = queue->next;

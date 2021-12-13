@@ -11,6 +11,7 @@ struct Coord {
 
 struct Cell {
 	short int jumptoBox;			//numero delle posizioni da saltare
+	short int status;				//se -1 = salta un turno; se 0 = casella vuota; se 1 = salta caselle indietro; se 2 = salta caselle in avanti
 	struct Coord coords;			//coordinate (indici) della casella
 };
 
