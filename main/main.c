@@ -22,7 +22,7 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 
 _Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();									//definisce l' azione che le caselle compiono
-struct Coord drawMapGame(struct Player*, struct Player);		//disegna la mappa di gioco
+struct Coord drawMapGame(struct Player*);		//disegna la mappa di gioco
 void drawMenu();											//disegna il menu principale
 char* getColor(int);										//prende il nome del colore assegnato ad un valore intero
 char* getColorCode(int);									//prende il codice del colore per disegnarlo nel terminale
@@ -82,8 +82,8 @@ int main() {
 				defineCellStatus();
 
 				while (true) {
+					currentPlayer = drawMapGame(queue);			//disegna la mappa di gioco
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
-					currentPlayer = drawMapGame(queue, tryMeem);			//disegna la mappa di gioco
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 					printf("Posizione x: %d, posizione y: %d, numeroCasella: %d\n", currentPlayer.x, currentPlayer.y, currentPlayer.numberCell);
@@ -247,7 +247,7 @@ void defineCellStatus(){
 
 }
 
-struct Coord drawMapGame(struct Player* queue, struct Player currentPlayer) {
+struct Coord drawMapGame(struct Player* queue) {
 	struct Coord playerCoords = { 0 };
 	short int indexX = 0, indexY = 0, x = 0, y = 0;			//indici per la gestione dell' output delle celle
 	char start = 192, midCorner = 193, mid = 196, endChar = 217;		//caratteri ASCII per disegnare la tabella
@@ -293,15 +293,17 @@ struct Coord drawMapGame(struct Player* queue, struct Player currentPlayer) {
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						printf("|");		//stampo il corpo della tabella
-
+						int firstPlayerId = tmp->id;
 						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
 							if (tmp != NULL) {
 								if (tmp->coords.numberCell == cells[x][y].coords.numberCell) {		//se coincidono i numeri della cella allora stampa il quadratino
 									printf("%s%d"reset, getColorCode(tmp->color), tmp->id);
-									if (tmp->id == currentPlayer.id) {
+									tmp->coords.x = y;
+									tmp->coords.y = x;
+									if (tmp->id == firstPlayerId) {
 										playerCoords.numberCell = tmp->coords.numberCell;
-										playerCoords.x = tmp->coords.x;
-										playerCoords.y = tmp->coords.y;
+										playerCoords.x = tmp->coords.x + 1;
+										playerCoords.y = tmp->coords.y + 1;
 									}
 								}
 								else
