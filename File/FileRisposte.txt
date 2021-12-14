@@ -1,0 +1,12 @@
+1861
+Potenza
+25
+Heap
+1999
+16
+85
+1789
+Campobasso
+8
+Stack
+144

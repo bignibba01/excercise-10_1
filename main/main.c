@@ -20,23 +20,25 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-_Bool askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
+char* askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
 _Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();									//definisce l' azione che le caselle compiono
-struct Coord drawMapGame(struct Player*);		//disegna la mappa di gioco
+struct Coord drawMapGame(struct Player*);					//disegna la mappa di gioco
 void drawMenu();											//disegna il menu principale
 char* getColor(int);										//prende il nome del colore assegnato ad un valore intero
 char* getColorCode(int);									//prende il codice del colore per disegnarlo nel terminale
 int getNumberPlayer();										//prende il numero dei giocatori
+int getNumberOfQuestion();									//prende il numero delle domande presenti nel file
 void prepareNumberCells();									//prepara la matrice con i numeri
 void printAvailableColor();									//stampa i colori disponibili
 void registerPlayer();										//inserisce il giocatore nella coda
+char* readUntilQuestion(short int);							//legge il file fino all'inizio di quella domanda
 int rollDice();												//tira il dado (1-6)
 void setPlayers(struct Player* queue);						//start position of player
 
 struct Player* queue = NULL;
 struct Cell cells[10][10] = { 0 };
-char *answerPath = "..\\File\\FileDomande.txt", *questionPath = "..\\File\\FileRisposte.txt";
+char *questionPath = "..\\File\\FileDomande.txt", *answerPath = "..\\File\\FileRisposte.txt";
 
 int main() {
 	srand(time(NULL));
@@ -88,6 +90,12 @@ int main() {
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
+
+					//prova domanda
+					char* domanda = NULL;
+					domanda = askQuestion();
+					printf("%s\n", domanda);			//problema stampa soltanto 16 caratteri (prova con stampa manuale)
+
 					printf("Tira il dado! ");
 					system("pause");
 					int number = rollDice();
@@ -102,6 +110,7 @@ int main() {
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
 						}
 						else if (cells[currentPlayer.x][currentPlayer.y].status == 2) {				//la casella fa andare avanti il giocatore se risponde correttamente ad una domanda
+							askQuestion();
 							printf("Avanti savoia!\n");
 						}
 					}else if (cells[currentPlayer.x][currentPlayer.y].status == -1){			//salta il turno
@@ -139,6 +148,14 @@ int main() {
 		system("cls");
 	}
 	return 0;
+}
+
+char* askQuestion() {
+	int numberQuestion = getNumberOfQuestion();
+
+	int question = rand() % numberQuestion + 1;
+	char* x = readUntilQuestion(question);
+	return x;
 }
 
 _Bool checkFreeColor(short int color) {
@@ -425,6 +442,29 @@ int getNumberPlayer() {
 	return tmpNumber;
 }
 
+int getNumberOfQuestion() {
+	FILE* questionFile;
+
+	if ((questionFile = fopen(questionPath, "r")) == NULL) {
+		printf("%sError -> File not found\n"reset, getColorCode(1));
+	}
+
+	char res;
+	int cont = 0;
+	while (true) {
+		res = getc(questionFile);
+		if (res == '\n') {
+			cont++;
+		}
+		else if (res == EOF) {
+			cont++;
+			break;
+		}
+
+	}
+	return cont;
+}
+
 void prepareNumberCells() {
 	int x = 0, y = 0, number = 0;
 	_Bool flag = true;
@@ -478,6 +518,45 @@ void printAvailableColor(struct Player* queue) {
 			printf("%d = %s\n", i + 1, getColor(colors[i]));
 	}
 
+}
+
+char* readUntilQuestion(short int numberQuestion) {
+	FILE* questionFile;
+	char* question = NULL;
+
+	if ((questionFile = fopen(questionPath, "r")) == NULL) {
+		printf("%sError -> File not found\n"reset, getColorCode(1));
+	}
+
+	char res, buffer[255];
+	int cont = 0;
+	while (true) {				//scorre tutto il file e ogni volta che trova uno \n incrementa un contatore delle domande
+		if (cont == numberQuestion - 1) {
+			break;
+		}
+		res = getc(questionFile);
+		if (res == '\n') {
+			cont++;
+		}
+		else if (res == EOF) {
+			cont++;
+			break;
+		}
+
+	}
+	int i = 0;
+	while (true) {			//legge la domanda
+		res = getc(questionFile);
+		if (res == '\n' || res == EOF)
+			break;
+		else {
+			buffer[i++] = res;
+		}
+
+	}
+	buffer[i] = '\0';
+
+	return buffer;
 }
 
 void registerPlayer() {
