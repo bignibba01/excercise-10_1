@@ -20,6 +20,7 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
+_Bool askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
 _Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();									//definisce l' azione che le caselle compiono
 struct Coord drawMapGame(struct Player*);		//disegna la mappa di gioco
@@ -86,7 +87,7 @@ int main() {
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
-					printf("Posizione x: %d, posizione y: %d, numeroCasella: %d\n", currentPlayer.x, currentPlayer.y, currentPlayer.numberCell);
+					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
 					printf("Tira il dado! ");
 					system("pause");
 					int number = rollDice();
@@ -94,6 +95,18 @@ int main() {
 					tryMeem.coords.numberCell += number;
 
 					printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
+
+					//se non è nulla di queste vuol dire che è una casella vuota
+					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
+						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
+							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].coords.numberCell;
+						}
+						else if (cells[currentPlayer.x][currentPlayer.y].status == 2) {				//la casella fa andare avanti il giocatore se risponde correttamente ad una domanda
+							printf("Avanti savoia!\n");
+						}
+					}else if (cells[currentPlayer.x][currentPlayer.y].status == -1){			//salta il turno
+						printf("Fermo!\n");
+					}
 
 					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
@@ -293,17 +306,17 @@ struct Coord drawMapGame(struct Player* queue) {
 					else if (j == 1) {		//sono al centro della casella
 						struct Player* tmp = queue;
 						printf("|");		//stampo il corpo della tabella
-						int firstPlayerId = tmp->id;
+						int firstPlayerId = tmp->id;			//mi serve per conoscere quale sarà il giocatore che dovrà giocare e prendere le sue informazioni
 						for (int i = 0; i < 5; i++) {			//stampo i valori di ogni cella
 							if (tmp != NULL) {
 								if (tmp->coords.numberCell == cells[x][y].coords.numberCell) {		//se coincidono i numeri della cella allora stampa il quadratino
 									printf("%s%d"reset, getColorCode(tmp->color), tmp->id);
-									tmp->coords.x = y;
-									tmp->coords.y = x;
+									tmp->coords.x = x;
+									tmp->coords.y = y;
 									if (tmp->id == firstPlayerId) {
 										playerCoords.numberCell = tmp->coords.numberCell;
-										playerCoords.x = tmp->coords.x + 1;
-										playerCoords.y = tmp->coords.y + 1;
+										playerCoords.x = tmp->coords.x;
+										playerCoords.y = tmp->coords.y;
 									}
 								}
 								else
