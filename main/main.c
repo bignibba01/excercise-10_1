@@ -99,7 +99,7 @@ int main() {
 					//se non è nulla di queste vuol dire che è una casella vuota
 					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
 						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
-							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].coords.numberCell;
+							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
 						}
 						else if (cells[currentPlayer.x][currentPlayer.y].status == 2) {				//la casella fa andare avanti il giocatore se risponde correttamente ad una domanda
 							printf("Avanti savoia!\n");
