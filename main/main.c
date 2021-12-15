@@ -34,7 +34,7 @@ int getNumberOfQuestion();									//prende il numero delle domande presenti nel
 void prepareNumberCells();									//prepara la matrice con i numeri
 void printAvailableColor();									//stampa i colori disponibili
 void registerPlayer();										//inserisce il giocatore nella coda
-char* readUntilQuestion(short int);							//legge il file fino all'inizio di quella domanda
+void readUntilQuestion(short int);							//legge il file fino all'inizio di quella domanda
 int rollDice();												//tira il dado (1-6)
 void setPlayers(struct Player* queue);						//start position of player
 
@@ -91,26 +91,35 @@ int main() {
 					_Bool questionFlag = false;
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
-					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
+					printf("NumeroCasella: %d\n", tryMeem.coords.numberCell);
 
 					
 						//se non è nulla di queste vuol dire che è una casella vuota
 					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
 						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
+							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);
+							system("cls");
+							drawMapGame(queue);
+							printf("Salto indietro del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
+							printf("NumeroCasella: %d\n", tryMeem.coords.numberCell);
+							system("pause");
+
 						}
 						else if (cells[currentPlayer.x][currentPlayer.y].status == 2) {				//la casella fa andare avanti il giocatore se risponde correttamente ad una domanda
 							int numberQuestion = askQuestion();
-							printf("Risposta: ");
 							char risp[255];
+
+							printf("Risposta: ");
 							scanf(" %s", risp);
 							fflush(stdin);
-							for (int i = 0; i < strlen(risp); i++)
+
+							for (int i = 0; i < strlen(risp); i++)				//formatto la risposta dell'utente
 								risp[i] = tolower(risp[i]);
 
 							if ((questionFlag = checkAnswer(numberQuestion, risp)) == true) {
 								printf("Risposta esatta!\n");				//salta in avanti
-								tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
+								tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;			//fa saltare il giocatore alla casella precalcolata
 							}
 							else {
 								printf("Risposta sbagliata!\n");				//non salta
@@ -123,14 +132,14 @@ int main() {
 						
 						if (tryMeem.isBlocked == false) {
 							printf("Fermo un turno!\n");
-							tryMeem.isBlocked = true;
+							tryMeem.isBlocked = true;			//imposta lo stato del giocatore a bloccato
 
 							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
 							system("pause");
 							system("cls");
 							continue;
 						}
-						else if (tryMeem.isBlocked == true) {
+						else if (tryMeem.isBlocked == true) {			//se il giocatore è bloccato vuol dire che è su una casella rossa
 							tryMeem.isBlocked = false;
 						}
 					}
@@ -138,10 +147,25 @@ int main() {
 					if (!questionFlag) {				//se non ha risposto correttamente alla domanda salta in avanti senza tirare il dado
 						printf("Tira il dado! ");
 						system("pause");
-						int number = rollDice();
-						tryMeem.coords.numberCell += number;
+						int number = rollDice();			//estrae un numero casuale
+						tryMeem.coords.numberCell += number;			//sposta il giocatore
 
 						printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
+						//system("pause");
+					}
+
+					if (tryMeem.coords.numberCell >= 100) {					//il giocatore ha vinto il gioco
+						system("cls");
+						tryMeem.coords.numberCell = 100;		//anceh se supera il traguardo setta la posizione a 100
+						pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//mi serve per ridisegnare la mappa con il giocatore al traguardo
+						drawMapGame(queue);
+
+						printf("Il giocatore %s%d"reset" ha vinto!\n", getColorCode(tryMeem.color), tryMeem.id);
+						printf("Uscita in corso...");
+						system("pause");
+						free(queue);			//libero l'heap di memoria occupato dalla lista
+						end = true;
+						break;
 					}
 
 					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
@@ -178,10 +202,10 @@ int main() {
 }
 
 int askQuestion() {
-	int numberQuestion = getNumberOfQuestion();
+	int numberQuestion = getNumberOfQuestion();			//pernde il numero totale delle domande
 
-	int question = rand() % numberQuestion + 1;
-	char* x = readUntilQuestion(question);
+	int question = rand() % numberQuestion + 1;		//ne estrae una casuale
+	readUntilQuestion(question);			//trova la domanda e la stampa
 	return question;
 }
 
@@ -198,7 +222,7 @@ _Bool checkAnswer(short int question, char risp[255]) {
 		if (cont == question - 1) {
 			break;
 		}
-		res = getc(answerFile);
+		res = getc(answerFile);					//scorre tutte le righe fino alla risposta rispettiva alla domanda
 		if (res == '\n') {
 			cont++;
 		}
@@ -220,8 +244,8 @@ _Bool checkAnswer(short int question, char risp[255]) {
 
 	}
 	buffer[i] = '\0';
-
-	if (strcmp(buffer, risp) == 0)
+	fclose(answerFile);
+	if (strcmp(buffer, risp) == 0)				//confronta la risposta esatta con la risposta dell'utente
 		return true;
 	else
 		return false;
@@ -232,7 +256,7 @@ _Bool checkFreeColor(short int color) {
 	struct Player* tmp = queue;
 
 	while (tmp != NULL) {
-		if (tmp->color == color) {
+		if (tmp->color == color) {				//controlla se il colore non è già stato preso da un altro giocatore
 			printf("%sErrore -> Colore gia' in uso da un altro giocatore.\n"reset, getColorCode(1));
 			return false;
 		}
@@ -400,7 +424,7 @@ struct Coord drawMapGame(struct Player* queue) {
 									printf("%s%d"reset, getColorCode(tmp->color), tmp->id);
 									tmp->coords.x = x;
 									tmp->coords.y = y;
-									if (tmp->id == firstPlayerId) {
+									if (tmp->id == firstPlayerId) {				//assegno i valori al giocatore
 										playerCoords.numberCell = tmp->coords.numberCell;
 										playerCoords.x = tmp->coords.x;
 										playerCoords.y = tmp->coords.y;
@@ -446,7 +470,7 @@ void drawMenu() {
 }
 
 char* getColor(int value) {
-	switch (value) {
+	switch (value) {			//prendo il nome del colore
 	case 1: {
 		return "Red";
 	}
@@ -472,7 +496,7 @@ char* getColor(int value) {
 }
 
 char* getColorCode(int value) {
-	switch (value) {
+	switch (value) {				//prendo il codice del colore per l'output
 	case 1: {
 		return "\33[31m";		//red
 	}
@@ -505,7 +529,7 @@ int getNumberPlayer() {
 	struct Player* tmp = queue;		//salvo una copia della testa della lista
 
 	while (tmp != NULL) {
-		tmpNumber = tmp->id;
+		tmpNumber = tmp->id;		//prendo l'ultimo id equivalente al numero di giocatori correnti
 		tmp = tmp->next;
 	}
 
@@ -524,9 +548,9 @@ int getNumberOfQuestion() {
 	while (true) {
 		res = getc(questionFile);
 		if (res == '\n') {
-			cont++;
+			cont++;					//conta il numero delle domande
 		}
-		else if (res == EOF) {
+		else if (res == EOF) {			//ovviamente l' ultima domanda nel file non dovrà avere lo \n senno si avrà una domanda in piu
 			cont++;
 			break;
 		}
@@ -540,21 +564,21 @@ void prepareNumberCells() {
 	_Bool flag = true;
 
 	for (int i = 0; i < 10; i++) {
-		for (int j = 0; j < 10; j++) {
-			if (y == -1) {
+		for (int j = 0; j < 10; j++) {			//soliti cicli della matrice 10x10
+			if (y == -1) {		//se la y va in negativo vuol dire che deve cambiare l'incremento
 				flag = true;
 				y++;
 			}
-			if (y == 10) {
+			if (y == 10) {				//se va oltre il massimo cambia incremento
 				flag = false;
 				y--;
 			}
 
-			number += 1;
+			number += 1;			//incrementa il numero dalla prima casella
 			cells[x][y].coords.numberCell = number;
-			cells[x][y].status = 0;
+			cells[x][y].status = 0;			//assegna a tutte le caselle lo stato 0 = caselle vuote
 
-			if (flag) {
+			if (flag) {				//cambia incremento a seconda del flag per creare il pattern del gioco
 				y++;
 			}
 			else {
@@ -562,7 +586,7 @@ void prepareNumberCells() {
 			}
 
 		}
-		x++;
+		x++;			//incrementa la riga 
 	}
 }
 
@@ -570,27 +594,26 @@ void printAvailableColor(struct Player* queue) {
 	struct Player* tmp = queue;
 	int colors[7] = { 0 };
 
-	for (int i = 0; i < sizeof(colors) / sizeof(int); i++)
+	for (int i = 0; i < sizeof(colors) / sizeof(int); i++)				//sizeof(colors) / sizeof(int) per sapere il numero di interi nel vettore
 		colors[i] = i + 1;
 
 	while (tmp != NULL) {
 
 		for (int i = 0; i < sizeof(colors) / sizeof(int); i++) {
 			if (colors[i] == tmp->color)
-				colors[i] = -1;
+				colors[i] = -1;				//il colore è già stato utilizzato
 		}
-
 		tmp = tmp->next;
 	}
 
 	for (int i = 0; i < sizeof(colors) / sizeof(int); i++) {
-		if (colors[i] != -1)
+		if (colors[i] != -1)				//se già preso non lo visualizza
 			printf("%d = %s\n", i + 1, getColor(colors[i]));
 	}
 
 }
 
-char* readUntilQuestion(short int numberQuestion) {
+void readUntilQuestion(short int numberQuestion) {
 	FILE* questionFile;
 	char* question = NULL;
 
@@ -604,11 +627,11 @@ char* readUntilQuestion(short int numberQuestion) {
 		if (cont == numberQuestion - 1) {
 			break;
 		}
-		res = getc(questionFile);
+		res = getc(questionFile);			//legge un carattere dal file
 		if (res == '\n') {
-			cont++;
+			cont++;									//conta il numero di righe equivalente al numero di domande
 		}
-		else if (res == EOF) {
+		else if (res == EOF) {					//anche se non è presente il terminatore per andare a capo
 			cont++;
 			break;
 		}
@@ -626,9 +649,8 @@ char* readUntilQuestion(short int numberQuestion) {
 	}
 	buffer[i] = '\0';
 
-	printf("%s\n", buffer);
-
-	return *buffer;
+	printf("%s\n", buffer);				//stampa la domanda
+	fclose(questionFile);
 }
 
 void registerPlayer() {
@@ -645,7 +667,7 @@ void registerPlayer() {
 		printf("Numero massimo di giocatori raggiunto!\n");
 	}
 	else {
-		_Bool flag = false;
+		_Bool flag = false;			//flag per la validità del valore
 		printf("Scegli il colore del giocatore!\n");
 
 		do {
@@ -657,7 +679,7 @@ void registerPlayer() {
 				printf("%sErrore -> Il valore non e' valido.\n"reset, getColorCode(1));
 			}
 			else
-				flag = checkFreeColor(tmpColor);
+				flag = checkFreeColor(tmpColor);			//controlla se il colore è disponibile
 		} while (!flag);
 
 		if (queue == NULL) {			//se il primo elemento della lista è nullo allora inserisce il primo valore
@@ -675,19 +697,19 @@ void registerPlayer() {
 
 int rollDice() {
 	
-	/*time_t start = clock(), current = 0;
+	//time_t start = clock(), current = 0;			//variabili temporali per fare un timer di 3 secondi per estrarre il numero
+	//do {
+	//	printf("%d\r", rand() % 6 + 1);
+	//	current = clock();
+	//} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);
 
-	do {
-		printf("%d\r", rand() % 6 + 1);
-		current = clock();
-	} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);*/
-	return rand() % 6 + 1;
+	return rand() % 6 + 1;			//numero da 1 a 6 compresi
 }
 
 void setPlayers(struct Player* queue) {
 
-	while (queue != NULL) {
-		queue->coords.numberCell = 1;
+	while (queue != NULL) {				//imposto i parametri base dei players
+		queue->coords.numberCell = 1;		//prima casella
 		queue->coords.x = 0;
 		queue->coords.y = 0;
 		queue->isBlocked = false;
