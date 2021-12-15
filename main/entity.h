@@ -19,7 +19,6 @@ struct Player {		//player entity
 	short int id;				//id del giocatore
 	short int color;			//colore scelto
 	_Bool isBlocked;
-	_Bool waited;
 	struct Coord coords;		//coordinate attuali
 	struct Player* next;		//puntatore all elemento della lista successivo
 };
@@ -27,7 +26,7 @@ struct Player {		//player entity
 void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
-void pushTurnQueue(struct Player*, short int, short int, short int, _Bool, _Bool);
+void pushTurnQueue(struct Player*, short int, short int, short int, _Bool);
 struct Player tryPop(struct Player**);
 
 void popQueueFirstElement(struct Player** head) {
@@ -76,7 +75,7 @@ void pushQueueElement(struct Player* head, short int id, short int color) {
 	head->next->next = NULL;
 }
 
-void pushTurnQueue(struct Player* head, short int id, short int color, short int number, _Bool isBlocked, _Bool waited) {
+void pushTurnQueue(struct Player* head, short int id, short int color, short int number, _Bool isBlocked) {
 
 	while (head->next != NULL) {
 		head = head->next;
@@ -87,7 +86,6 @@ void pushTurnQueue(struct Player* head, short int id, short int color, short int
 	head->next->color = color;
 	head->next->coords.numberCell = number;
 	head->next->isBlocked = isBlocked;
-	head->next->waited = waited;
 	head->next->next = NULL;
 }
 

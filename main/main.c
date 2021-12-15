@@ -125,7 +125,7 @@ int main() {
 							printf("Fermo un turno!\n");
 							tryMeem.isBlocked = true;
 
-							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked, tryMeem.waited);			//metto in coda l' elemento tolto ocn il pop precedente
+							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
 							system("pause");
 							system("cls");
 							continue;
@@ -144,7 +144,7 @@ int main() {
 						printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
 					}
 
-					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked, tryMeem.waited);			//metto in coda l' elemento tolto ocn il pop precedente
+					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
 					system("cls");
 				}
@@ -691,7 +691,6 @@ void setPlayers(struct Player* queue) {
 		queue->coords.x = 0;
 		queue->coords.y = 0;
 		queue->isBlocked = false;
-		queue->waited = false;
 		queue = queue->next;
 	}
 
