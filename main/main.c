@@ -20,7 +20,7 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-char* askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
+int askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
 _Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();									//definisce l' azione che le caselle compiono
 struct Coord drawMapGame(struct Player*);					//disegna la mappa di gioco
@@ -91,10 +91,7 @@ int main() {
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
 
-					//prova domanda
-					char* domanda = NULL;
-					domanda = askQuestion();
-					printf("%s\n", domanda);			//problema stampa soltanto 16 caratteri (prova con stampa manuale)
+					int numberQuestion = askQuestion();
 
 					printf("Tira il dado! ");
 					system("pause");
@@ -150,12 +147,12 @@ int main() {
 	return 0;
 }
 
-char* askQuestion() {
+int askQuestion() {
 	int numberQuestion = getNumberOfQuestion();
 
 	int question = rand() % numberQuestion + 1;
 	char* x = readUntilQuestion(question);
-	return x;
+	return question;
 }
 
 _Bool checkFreeColor(short int color) {
@@ -556,7 +553,9 @@ char* readUntilQuestion(short int numberQuestion) {
 	}
 	buffer[i] = '\0';
 
-	return buffer;
+	printf("%s\n", buffer);
+
+	return *buffer;
 }
 
 void registerPlayer() {
