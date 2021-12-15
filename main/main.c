@@ -85,7 +85,6 @@ int main() {
 				setPlayers(queue);
 				prepareNumberCells();
 				defineCellStatus();
-
 				while (true) {
 					currentPlayer = drawMapGame(queue);			//disegna la mappa di gioco
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
@@ -94,7 +93,8 @@ int main() {
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
 
-					//se non è nulla di queste vuol dire che è una casella vuota
+					
+						//se non è nulla di queste vuol dire che è una casella vuota
 					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
 						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
@@ -118,9 +118,23 @@ int main() {
 
 
 						}
-					}else if (cells[currentPlayer.x][currentPlayer.y].status == -1){			//salta il turno
-						printf("Fermo!\n");
 					}
+					else if (cells[currentPlayer.x][currentPlayer.y].status == -1) {			//salta il turno
+						
+						if (tryMeem.isBlocked == false) {
+							printf("Fermo un turno!\n");
+							tryMeem.isBlocked = true;
+
+							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked, tryMeem.waited);			//metto in coda l' elemento tolto ocn il pop precedente
+							system("pause");
+							system("cls");
+							continue;
+						}
+						else if (tryMeem.isBlocked == true) {
+							tryMeem.isBlocked = false;
+						}
+					}
+
 					if (!questionFlag) {				//se non ha risposto correttamente alla domanda salta in avanti senza tirare il dado
 						printf("Tira il dado! ");
 						system("pause");
@@ -129,7 +143,8 @@ int main() {
 
 						printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
 					}
-					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);			//metto in coda l' elemento tolto ocn il pop precedente
+
+					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked, tryMeem.waited);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
 					system("cls");
 				}
@@ -675,6 +690,8 @@ void setPlayers(struct Player* queue) {
 		queue->coords.numberCell = 1;
 		queue->coords.x = 0;
 		queue->coords.y = 0;
+		queue->isBlocked = false;
+		queue->waited = false;
 		queue = queue->next;
 	}
 
