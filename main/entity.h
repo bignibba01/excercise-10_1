@@ -23,11 +23,26 @@ struct Player {		//player entity
 	struct Player* next;		//puntatore all elemento della lista successivo
 };
 
+void changeHeadNumberCell(struct Player**, struct Player);
 void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
 void printQueueAllElement(struct Player*);				//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
 void pushTurnQueue(struct Player*, short int, short int, short int, _Bool);
 struct Player tryPop(struct Player**);
+
+void changeHeadNumberCell(struct Player** head, struct Player tmp) {
+	struct Player* node = NULL;
+	node = (struct Player*)malloc(sizeof(struct Player));
+
+	node->id = tmp.id;
+	node->color = tmp.color;
+	node->coords.numberCell = tmp.coords.numberCell;
+	node->isBlocked = tmp.isBlocked;
+	node->next = *head;
+
+	*head = node;
+
+}
 
 void popQueueFirstElement(struct Player** head) {
 	struct Player* next_node = NULL;

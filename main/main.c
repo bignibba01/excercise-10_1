@@ -98,9 +98,11 @@ int main() {
 					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
 						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
-							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);
+							struct Player* copy = queue;
+							changeHeadNumberCell(&copy, tryMeem);
+
 							system("cls");
-							drawMapGame(queue);
+							drawMapGame(copy);
 							printf("Salto indietro del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 							printf("NumeroCasella: %d\n", tryMeem.coords.numberCell);
 							system("pause");
