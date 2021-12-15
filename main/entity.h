@@ -90,17 +90,17 @@ void pushQueueElement(struct Player* head, short int id, short int color) {
 	head->next->next = NULL;
 }
 
-void pushTurnQueue(struct Player* head, short int id, short int color, short int number, _Bool isBlocked) {
+void pushTurnQueue(struct Player* head, struct Player tryMeem) {
 
 	while (head->next != NULL) {
 		head = head->next;
 	}
 
 	head->next = (struct Player*)malloc(sizeof(struct Player));					//inserimento di tutti i parametri dei giocatori
-	head->next->id = id;
-	head->next->color = color;
-	head->next->coords.numberCell = number;
-	head->next->isBlocked = isBlocked;
+	head->next->id = tryMeem.id;
+	head->next->color = tryMeem.color;
+	head->next->coords.numberCell = tryMeem.coords.numberCell;
+	head->next->isBlocked = tryMeem.isBlocked;
 	head->next->next = NULL;
 }
 

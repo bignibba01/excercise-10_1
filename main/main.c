@@ -159,7 +159,7 @@ int main() {
 					if (tryMeem.coords.numberCell >= 100) {					//il giocatore ha vinto il gioco
 						system("cls");
 						tryMeem.coords.numberCell = 100;		//anceh se supera il traguardo setta la posizione a 100
-						pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//mi serve per ridisegnare la mappa con il giocatore al traguardo
+						pushTurnQueue(queue, tryMeem);			//mi serve per ridisegnare la mappa con il giocatore al traguardo
 						drawMapGame(queue);
 
 						printf("Il giocatore %s%d"reset" ha vinto!\n", getColorCode(tryMeem.color), tryMeem.id);
