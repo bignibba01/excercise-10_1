@@ -5,6 +5,7 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 */
 
 #define _CRT_SECURE_NO_WARNINGS
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,8 @@ Il gioco consistente nel far competere più giocatori al raggiungimento della ca
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-int askQuestion();										//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
+int askQuestion();											//chiede all' utente una domanda se si trova in una delle caselle per saltarne altre
+_Bool checkAnswer(short int, char[255]);					//controlla se la risposta inserita è esatta o meno
 _Bool checkFreeColor(short int);							//scorre tutta la coda dei giocatori per vedere se un colore è gia stato selezionato
 void defineCellStatus();									//definisce l' azione che le caselle compiono
 struct Coord drawMapGame(struct Player*);					//disegna la mappa di gioco
@@ -87,19 +89,10 @@ int main() {
 				while (true) {
 					currentPlayer = drawMapGame(queue);			//disegna la mappa di gioco
 					struct Player tryMeem = tryPop(&queue);				//giocatore che dovrà giocare il turno
+					_Bool questionFlag = false;
 
 					printf("Turno del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 					printf("NumeroCasella: %d\n", currentPlayer.numberCell);
-
-					int numberQuestion = askQuestion();
-
-					printf("Tira il dado! ");
-					system("pause");
-					int number = rollDice();
-
-					tryMeem.coords.numberCell += number;
-
-					printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
 
 					//se non è nulla di queste vuol dire che è una casella vuota
 					if (cells[currentPlayer.x][currentPlayer.y].status >= 1) {			//vuol dire che il giocatore si trova su una casella di salto
@@ -107,13 +100,35 @@ int main() {
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
 						}
 						else if (cells[currentPlayer.x][currentPlayer.y].status == 2) {				//la casella fa andare avanti il giocatore se risponde correttamente ad una domanda
-							askQuestion();
-							printf("Avanti savoia!\n");
+							int numberQuestion = askQuestion();
+							printf("Risposta: ");
+							char risp[255];
+							scanf(" %s", risp);
+							fflush(stdin);
+							for (int i = 0; i < strlen(risp); i++)
+								risp[i] = tolower(risp[i]);
+
+							if ((questionFlag = checkAnswer(numberQuestion, risp)) == true) {
+								printf("Risposta esatta!\n");				//salta in avanti
+								tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
+							}
+							else {
+								printf("Risposta sbagliata!\n");				//non salta
+							}
+
+
 						}
 					}else if (cells[currentPlayer.x][currentPlayer.y].status == -1){			//salta il turno
 						printf("Fermo!\n");
 					}
+					if (!questionFlag) {				//se non ha risposto correttamente alla domanda salta in avanti senza tirare il dado
+						printf("Tira il dado! ");
+						system("pause");
+						int number = rollDice();
+						tryMeem.coords.numberCell += number;
 
+						printf("%s%d\n"reset, getColorCode(tryMeem.color), number);
+					}
 					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
 					system("cls");
@@ -153,6 +168,49 @@ int askQuestion() {
 	int question = rand() % numberQuestion + 1;
 	char* x = readUntilQuestion(question);
 	return question;
+}
+
+_Bool checkAnswer(short int question, char risp[255]) {
+	FILE* answerFile = NULL;
+
+	if ((answerFile = fopen(answerPath, "r")) == NULL) {
+		printf("%sError -> File not found\n"reset, getColorCode(1));
+	}
+
+	char res, buffer[255];
+	int cont = 0;
+	while (true) {				//scorre tutto il file e ogni volta che trova uno \n incrementa un contatore delle domande
+		if (cont == question - 1) {
+			break;
+		}
+		res = getc(answerFile);
+		if (res == '\n') {
+			cont++;
+		}
+		else if (res == EOF) {
+			cont++;
+			break;
+		}
+
+	}
+
+	int i = 0;
+	while (true) {			//legge la domanda
+		res = getc(answerFile);
+		if (res == '\n' || res == EOF)
+			break;
+		else {
+			buffer[i++] = tolower(res);
+		}
+
+	}
+	buffer[i] = '\0';
+
+	if (strcmp(buffer, risp) == 0)
+		return true;
+	else
+		return false;
+
 }
 
 _Bool checkFreeColor(short int color) {
