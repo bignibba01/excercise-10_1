@@ -23,24 +23,24 @@ struct Player {		//player entity
 	struct Player* next;		//puntatore all elemento della lista successivo
 };
 
-void changeHeadNumberCell(struct Player**, struct Player);
-void popQueueFirstElement(struct Player**);				//toglie un valore dalla testa della coda (FIFO)
-void printQueueAllElement(struct Player*);				//visualizza tutta la coda
+void changeHeadNumberCell(struct Player**, struct Player);					//aggiunge un elemento alla testa della coda per poter effettuare il salto all'indietro
+void popQueueFirstElement(struct Player**);									//toglie un valore dalla testa della coda (FIFO)
+void printQueueAllElement(struct Player*);									//visualizza tutta la coda
 void pushQueueElement(struct Player*, short int, short int);				//aggiunge un valore alla coda dei giocatori
-void pushTurnQueue(struct Player*, short int, short int, short int, _Bool);
+void pushTurnQueue(struct Player*, struct Player);							//aggiunge i valori del giocatore alla queue
 struct Player tryPop(struct Player**);
 
 void changeHeadNumberCell(struct Player** head, struct Player tmp) {
 	struct Player* node = NULL;
-	node = (struct Player*)malloc(sizeof(struct Player));
+	node = (struct Player*)malloc(sizeof(struct Player));			//mi creo un elemento temporaneo
 
 	node->id = tmp.id;
 	node->color = tmp.color;
 	node->coords.numberCell = tmp.coords.numberCell;
 	node->isBlocked = tmp.isBlocked;
-	node->next = *head;
+	node->next = *head;					//assegno i valori e l' elemento puntato che sarebbe la testa corrente della coda
 
-	*head = node;
+	*head = node;				//modifico l'indirizzo della testa della coda
 
 }
 
@@ -72,7 +72,7 @@ struct Player tryPop(struct Player** head) {
 	}
 
 	next_node = (*head)->next;
-	tryMeme = **head;
+	tryMeme = **head;			//salva il giocatore in testa alla coda
 	free(*head);
 	*head = next_node;
 	return tryMeme;
@@ -84,7 +84,7 @@ void pushQueueElement(struct Player* head, short int id, short int color) {
 		head = head->next;
 	}
 
-	head->next = (struct Player*)malloc(sizeof(struct Player));
+	head->next = (struct Player*)malloc(sizeof(struct Player));				//inserimento iniziale per assegnare i giocatori
 	head->next->id = id;
 	head->next->color = color;
 	head->next->next = NULL;
@@ -96,7 +96,7 @@ void pushTurnQueue(struct Player* head, short int id, short int color, short int
 		head = head->next;
 	}
 
-	head->next = (struct Player*)malloc(sizeof(struct Player));
+	head->next = (struct Player*)malloc(sizeof(struct Player));					//inserimento di tutti i parametri dei giocatori
 	head->next->id = id;
 	head->next->color = color;
 	head->next->coords.numberCell = number;

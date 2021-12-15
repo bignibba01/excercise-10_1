@@ -99,10 +99,10 @@ int main() {
 						if (cells[currentPlayer.x][currentPlayer.y].status == 1) {				//la casella fa andare indietro il giocatore
 							tryMeem.coords.numberCell = cells[currentPlayer.x][currentPlayer.y].jumptoBox;
 							struct Player* copy = queue;
-							changeHeadNumberCell(&copy, tryMeem);
+							changeHeadNumberCell(&copy, tryMeem);				//mi creo una copia della lista cosi da poter stampare il cambiamento della casella a causa del salto all'indietro
 
 							system("cls");
-							drawMapGame(copy);
+							drawMapGame(copy);			//ridisegno la mappa passando la copia
 							printf("Salto indietro del giocatore: %s%d\n"reset, getColorCode(tryMeem.color), tryMeem.id);
 							printf("NumeroCasella: %d\n", tryMeem.coords.numberCell);
 							system("pause");
@@ -136,7 +136,7 @@ int main() {
 							printf("Fermo un turno!\n");
 							tryMeem.isBlocked = true;			//imposta lo stato del giocatore a bloccato
 
-							pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
+							pushTurnQueue(queue, tryMeem);			//metto in coda l' elemento tolto ocn il pop precedente
 							system("pause");
 							system("cls");
 							continue;
@@ -170,7 +170,7 @@ int main() {
 						break;
 					}
 
-					pushTurnQueue(queue, tryMeem.id, tryMeem.color, tryMeem.coords.numberCell, tryMeem.isBlocked);			//metto in coda l' elemento tolto ocn il pop precedente
+					pushTurnQueue(queue, tryMeem);			//metto in coda l' elemento tolto ocn il pop precedente
 					system("pause");
 					system("cls");
 				}
@@ -699,11 +699,11 @@ void registerPlayer() {
 
 int rollDice() {
 	
-	//time_t start = clock(), current = 0;			//variabili temporali per fare un timer di 3 secondi per estrarre il numero
-	//do {
-	//	printf("%d\r", rand() % 6 + 1);
-	//	current = clock();
-	//} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);
+	time_t start = clock(), current = 0;			//variabili temporali per fare un timer di 3 secondi per estrarre il numero
+	do {
+		printf("%d\r", rand() % 6 + 1);
+		current = clock();
+	} while ((((float)current - (float)start) / CLOCKS_PER_SEC) <= 3);
 
 	return rand() % 6 + 1;			//numero da 1 a 6 compresi
 }
